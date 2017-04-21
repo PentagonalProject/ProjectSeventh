@@ -137,13 +137,14 @@ function isIIS7()
  *
  * @return bool
  */
-function isMobile() {
+function isMobile()
+{
     if (empty($_SERVER['HTTP_USER_AGENT'])) {
         return false;
     }
 
     $userAgent = $_SERVER['HTTP_USER_AGENT'];
-    if ( strpos($userAgent, 'Mobile') !== false // many mobile devices (all iPhone, iPad, etc.)
+    if (strpos($userAgent, 'Mobile') !== false // many mobile devices (all iPhone, iPad, etc.)
         || strpos($userAgent, 'Android') !== false
         || strpos($userAgent, 'Silk/') !== false
         || strpos($userAgent, 'Kindle') !== false
