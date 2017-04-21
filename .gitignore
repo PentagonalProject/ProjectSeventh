@@ -173,3 +173,4 @@ vendor
 # Ignore Visual Studio code
 .vscode
 
+Modules/*/

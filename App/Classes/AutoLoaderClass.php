@@ -1,11 +1,11 @@
 <?php
-namespace Pentagonal\ProjectApi;
+namespace PentagonalProject\ProjectSeventh;
 
 /**
  * Class AutoLoaderClass
- * @package Pentagonal\ProjectApi
+ * @package PentagonalProject\ProjectSeventh
  */
-class AutoLoaderClass
+final class AutoLoaderClass
 {
     const NAME_SPACE_KEY = '__NAMESPACE__';
     const CLASS_NAME_KEY = '__CLASS__';
@@ -22,7 +22,12 @@ class AutoLoaderClass
      *
      * @var array
      */
-    private static $classLoadedRef = [];
+    private static $classMapReference = [];
+
+    /**
+     * @var array
+     */
+    protected $classMap = [];
 
     /**
      * Base on Directory
@@ -47,7 +52,15 @@ class AutoLoaderClass
      */
     public static function getReferences()
     {
-        return AutoLoaderClass::$references;
+        return self::$references;
+    }
+
+    /**
+     * @return string[] class map with lower case key
+     */
+    public function getClassMap()
+    {
+        return $this->classMap;
     }
 
     /**
@@ -99,15 +112,15 @@ class AutoLoaderClass
     private function pushReference($group, $class, $file)
     {
         if ($file = stream_resolve_include_path($file)) {
-            $ref =& AutoLoaderClass::$references;
             // references name space
             $nameSpace = $this->resolveNameSpace($group);
             $group     = $this->toLower($nameSpace);
             if ($this->hasGroupReference($group)) {
-                $ref[$group] = [];
+                self::$references[$group] = [];
             }
-
-            return $ref[$group][$this->resolveNameSpaceLower($class)] = $file;
+            $class = $this->resolveNameSpaceLower($class);
+            $this->classMap[$class] = $file;
+            return self::$references[$group][$class] = $file;
         }
 
         return false;
@@ -122,9 +135,8 @@ class AutoLoaderClass
         if (!is_string($class)) {
             return false;
         }
-
         if ($file = $this->findFileFor($class)) {
-            // prevent multiple call instance of class
+            // prevent multiple call instanphpfastcachece of class
             if (class_exists($class)) {
                 return true;
             }
@@ -161,6 +173,16 @@ class AutoLoaderClass
     }
 
     /**
+     * @param array $nameSpaceAndDirectory
+     */
+    public static function createRegisterArray(array $nameSpaceAndDirectory)
+    {
+        foreach ($nameSpaceAndDirectory as $key => $item) {
+            self::createRegister($key, $item);
+        }
+    }
+
+    /**
      * Register Auto load
      *
      * @param bool $prepend
@@ -168,41 +190,48 @@ class AutoLoaderClass
      */
     public function register($prepend = false)
     {
-        return spl_autoload_register([$this, 'load'], true, $prepend);
+        return spl_autoload_register($this, true, $prepend);
     }
 
     /**
-     * Un-Registers this instance as an autoloader.
+     * Un-Registers this instance as an auto loader.
      */
     public function unRegister()
     {
-        spl_autoload_unregister([$this, 'load']);
+        spl_autoload_unregister($this);
     }
 
     /**
      * Get File For Class
      *
-     * @param string $class
+     * @param string $Class
      * @return bool|string
      */
-    protected function findFileFor($class)
+    protected function findFileFor($Class)
     {
-        $class = $this->resolveNameSpaceLower($class);
-        if (isset(self::$classLoadedRef[$class])) {
-            return self::$classLoadedRef[$class];
+        $Class = $this->resolveNameSpace($Class);
+        $class = $this->toLower($Class);
+        if ($class) {
+            if (isset($this->classMap[$class])) {
+                return $this->classMap[$class];
+            }
+            if (isset(self::$classMapReference[$class])) {
+                return self::$classMapReference[$class];
+            }
         }
 
         if (false !== $file = $this->getClassReference($class)) {
             return $file;
         }
 
+        $namespace= $this->resolveNameSpaceLower($this->nameSpace);
         foreach ($this->baseDirectory as $directory) {
             if (!is_string($directory) || ! ($directory = realpath($directory))) {
                 continue;
             }
 
-            if (false !== $pos = strpos($class, $this->nameSpace)) {
-                $class = substr($class, $pos+1);
+            if (0 === $pos = strpos($class, $namespace)) {
+                $class = substr($Class, strlen($namespace)+1);
             }
 
             $file = $this->pushReference(
@@ -210,9 +239,8 @@ class AutoLoaderClass
                 $class,
                 $directory . DIRECTORY_SEPARATOR . $class . '.php'
             );
-
             if ($file) {
-                self::$classLoadedRef[$this->resolveNameSpaceLower($class)] = $file;
+                self::$classMapReference[$this->resolveNameSpaceLower($class)] = $file;
                 break;
             }
         }
@@ -286,7 +314,15 @@ class AutoLoaderClass
     protected function hasGroupReference($group)
     {
         $group = $this->resolveNameSpaceLower($group);
-        return isset(AutoLoaderClass::$references[$group]);
+        return isset(self::$references[$group]);
+    }
+
+    /**
+     * @param $class
+     */
+    public function __invoke($class)
+    {
+        call_user_func_array([$this, 'load'], func_get_args());
     }
 }
 

@@ -5,7 +5,6 @@
 return [
     'directory' => [
         'storage' => __DIR__ . DIRECTORY_SEPARATOR . 'Storage',
-        'app'     => __DIR__ . DIRECTORY_SEPARATOR . 'App',
         'module'  => __DIR__ . DIRECTORY_SEPARATOR . 'Modules',
     ],
     'database' => [
@@ -15,6 +14,7 @@ return [
         'name'     => '',
         'port'     => 3306,
         'charset'  => 'utf-8',
+        'collate'  => 'utf8_unicode_ci',
     ],
     'environment' => [
         'debug'   => true,
