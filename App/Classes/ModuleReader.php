@@ -3,8 +3,9 @@ namespace PentagonalProject\ProjectSeventh;
 
 use Apatis\Exceptions\Exception;
 use Apatis\Exceptions\InvalidArgumentException;
+use Apatis\Exceptions\RuntimeException;
 use PentagonalProject\ProjectSeventh\Exceptions\EmptyFileException;
-use PentagonalProject\ProjectSeventh\Exceptions\InvalidFileNameException;
+use PentagonalProject\ProjectSeventh\Exceptions\InvalidPathException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidModuleException;
 
 /**
@@ -29,22 +30,41 @@ class ModuleReader
     protected $instance;
 
     /**
+     * @var string
+     */
+    protected $moduleClass;
+
+    /**
      * ModuleReader constructor.
      * @param string $file
      */
     public function __construct(string $file)
     {
-        file_exists($file) && ($this->file = stream_resolve_include_path($file));
-        if ($this->file) {
-            clearstatcache($this->file);
-            if (pathinfo($this->file, PATHINFO_EXTENSION) !== 'php') {
-                $this->file = false;
+        $this->moduleClass = Module::class;
+        if (file_exists($file)) {
+            $spl = new \SplFileInfo($file);
+            if ($spl->isLink()) {
+                throw new InvalidArgumentException(
+                    "Argument could not as a symlink.",
+                    E_WARNING
+                );
+            }
+            if (!$spl->isFile()) {
+                throw new InvalidArgumentException(
+                    "Argument is not a file.",
+                    E_WARNING
+                );
+            }
+
+            if (strtolower($spl->getExtension()) !== 'php') {
                 throw new InvalidArgumentException(
                     "Module file has invalid extension. Extension must be as `php`",
                     E_WARNING
                 );
             }
 
+            $this->file = $spl->getRealPath();
+            unset($spl);
             return;
         }
 
@@ -59,9 +79,19 @@ class ModuleReader
      *
      * @return bool|string
      */
-    public function getFilePath()
+    public function getFile()
     {
         return $this->file;
+    }
+
+    /**
+     * Get Directory
+     *
+     * @return string
+     */
+    public function getDirectory()
+    {
+        return dirname($this->file);
     }
 
     /**
@@ -82,12 +112,12 @@ class ModuleReader
 
     /**
      * @return ModuleReader
-     * @throws InvalidFileNameException
+     * @throws InvalidPathException
      * @throws Exception
      */
     public function process() : ModuleReader
     {
-        if (!$this->getFilePath()) {
+        if (!$this->getFile()) {
             $this->valid = false;
         }
 
@@ -96,8 +126,8 @@ class ModuleReader
             return $this;
         }
 
-        if (preg_match('/[^a-z0-9\_]/i', basename($this->file))) {
-            throw new InvalidFileNameException(
+        if (preg_match('/[^a-z0-9\_]/i', pathinfo($this->file, PATHINFO_FILENAME))) {
+            throw new InvalidPathException(
                 $this->file,
                 sprintf(
                     "Invalid base file name for %s, file name must be contain alpha numeric and underscore only",
@@ -118,19 +148,39 @@ class ModuleReader
      */
     private function validate() : ModuleReader
     {
+        if (!is_string($this->moduleClass)) {
+            throw new RuntimeException(
+                "Invalid Parent Module Class. Module extends must be as class name and string."
+            );
+        }
+
+        $this->moduleClass = rtrim($this->moduleClass, '\\');
+        if (!class_exists($this->moduleClass)
+            || strtolower($this->moduleClass) != strtolower(Module::class)
+                && ! is_subclass_of($this->moduleClass, Module::class)
+        ) {
+            throw new RuntimeException(
+                sprintf(
+                    "Parent Module class Does not extends into %s",
+                    Module::class
+                )
+            );
+        }
+
         /**
          * strip white space is remove all new line and double spaces
          * and remove all comments
          * @see php_strip_whitespace()
          * just het 204b byte to get content
          */
-        $content = substr(php_strip_whitespace($this->getFilePath()), 0, 2048);
+        $content = substr(php_strip_whitespace($this->getFile()), 0, 2048);
         if (!$content) {
             throw new EmptyFileException(
-                $this->getFilePath()
+                $this->getFile()
             );
         }
-        if (strtolower(substr($content, 0, 4)) !== '<?php') {
+
+        if (strtolower(substr($content, 0, 5)) !== '<?php') {
             throw new InvalidModuleException(
                 "Invalid module, module does not start with open php tag.",
                 E_ERROR
@@ -138,7 +188,7 @@ class ModuleReader
         }
 
         $namespace = '\\';
-        if (preg_match('/\<\?php\s+namespace\s+(?p<namespace>[^;]+)/ms', $content, $namespaces)
+        if (preg_match('/\<\?php\s+namespace\s+(?P<namespace>[^;\{]+)/ms', $content, $namespaces)
             && !empty($namespaces['namespace'])
         ) {
             if (strtolower(trim($namespaces['namespace'])) == strtolower(__NAMESPACE__)) {
@@ -157,29 +207,36 @@ class ModuleReader
             );
         }
 
-        $moduleClass = Module::class;
+        $moduleClass = $this->moduleClass;
         preg_match(
             '/use\s+
-                (?:\\\{1})?'.preg_quote($moduleClass, '/').'
+                (?:\\\{1})?(?P<extended>'.preg_quote($moduleClass, '/').')
                 (?:\s+as\s+(?P<alias>[a-z0-9_]+))?;+
             /smx',
             $content,
             $asAlias
         );
 
-        $alias = isset($asAlias['alias']) ? $asAlias['alias'] : null;
+        $alias = isset($asAlias['alias'])
+            ? $asAlias['alias']
+            : null;
+        if (!$alias && isset($asAlias['extended'])) {
+            $asAlias['extended'] = explode('\\', $asAlias['extended']);
+            $alias = end($asAlias['extended']);
+        }
+
         // replace for unused text
         $content = preg_replace(
             [
-                '`^\<\?php\s+(?:namespace\s+[^;]+;\s*)?`smi',
-                '`(?:use[^;]+;\s*)*\s*(class)`smi'
+                '`^\<\?php\s+(?:namespace\s+([^;\{])*[;\{]\s*)?`smi',
+                '`(use[^;]+;\s*)*\s*(class)`smi'
             ],
-            '$1',
+            '$2',
             $content
         );
 
         $regexNameSpace = $alias
-            ? '(?P<extends>('.preg_quote("\\{$moduleClass}", '/').'))\s*'
+            ? '(?P<extends>('.preg_quote("{$alias}", '/').'))\s*'
             : '(?P<extends>('.preg_quote("\\{$moduleClass}", '/') . '|' . preg_quote($alias, '/').'))\s*';
         preg_match(
             '`class\s+
@@ -198,7 +255,7 @@ class ModuleReader
             );
         }
 
-        if (strtolower(pathinfo(basename($this->file), PATHINFO_FILENAME)) !== strtolower($class['class'])) {
+        if (strtolower(pathinfo($this->file, PATHINFO_FILENAME)) !== strtolower($class['class'])) {
             throw new InvalidModuleException(
                 "File Module does not match between file name & class.",
                 E_ERROR
@@ -212,10 +269,21 @@ class ModuleReader
             );
         }
 
+        $class = $class['class'];
         $namespace = rtrim($namespace, '\\');
         $class = "{$namespace}\\{$class}";
+
+        // prevent multiple include file if class has been loaded
+        if (class_exists($class)) {
+            throw new InvalidModuleException(
+                "Object class {$class} for module has been loaded.",
+                E_ERROR
+            );
+        }
+
         // start buffer
         ob_start();
+
         // include once
         IncludeFileOnce($this->file);
         if ($error = error_get_last() && !empty($error) && $error['file'] == $this->file) {
@@ -235,6 +303,7 @@ class ModuleReader
             );
         }
 
+        $this->valid = true;
         $this->instance = new $class;
         return $this;
     }

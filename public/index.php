@@ -109,5 +109,5 @@ EOF;
 }
 
 require __DIR__ . '/../vendor/autoload.php';
-$app = new PentagonalProject\ProjectSeventh\Application((array) require __DIR__. '/../config.php');
-print_r($app->run());
+
+return (new PentagonalProject\ProjectSeventh\Application((array) require __DIR__. '/../config.php'))->run();

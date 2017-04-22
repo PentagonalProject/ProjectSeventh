@@ -9,6 +9,13 @@ use PentagonalProject\ProjectSeventh\Interfaces\ModuleInterface;
  */
 abstract class Module implements ModuleInterface
 {
+    const MODULE_NAME       = 'name';
+    const MODULE_URI        = 'uri';
+    const MODULE_VERSION    = 'version';
+    const MODULE_AUTHOR     = 'author';
+    const MODULE_AUTHOR_URI = 'author_uri';
+    const MODULE_DESCRIPTION = 'description';
+
     /**
      * Module Name
      *
@@ -57,6 +64,67 @@ abstract class Module implements ModuleInterface
      */
     final public function __construct()
     {
+        $this->getModuleName();
+    }
+
+    /**
+     * Get Module Info
+     *
+     * @return array
+     */
+    public function getModuleInfo() : array
+    {
+        return [
+            Module::MODULE_NAME    => $this->getModuleName(),
+            Module::MODULE_VERSION => $this->getModuleVersion(),
+            Module::MODULE_URI     => $this->getModuleUri(),
+            Module::MODULE_AUTHOR  => $this->getModuleAuthor(),
+            Module::MODULE_AUTHOR_URI  => $this->getModuleAuthorUri(),
+            Module::MODULE_DESCRIPTION => $this->getModuleDescription()
+        ];
+    }
+
+    /**
+     * @return \ReflectionClass
+     */
+    final protected function getReflection() : \ReflectionClass
+    {
+        static $reflection;
+        if (!$reflection || ! $reflection instanceof \ReflectionClass) {
+            $reflection = new \ReflectionClass($this);
+        }
+
+        return $reflection;
+    }
+
+    /**
+     * Get Path
+     *
+     * @return string
+     */
+    final public function getModuleRealPath() : string
+    {
+        return $this->getReflection()->getFileName();
+    }
+
+    /**
+     * Get Name Space
+     *
+     * @return string
+     */
+    final public function getModuleNameSpace() : string
+    {
+        return $this->getReflection()->getNamespaceName();
+    }
+
+    /**
+     * Get ShortName of Class
+     *
+     * @return string
+     */
+    final public function getModuleShortName() : string
+    {
+        return $this->getReflection()->getShortName();
     }
 
     /**
@@ -67,7 +135,7 @@ abstract class Module implements ModuleInterface
         if (!is_string($this->module_name)
             || trim($this->module_name) == ''
         ) {
-            $this->module_name = get_class($this);
+            $this->module_name = $this->getReflection()->getName();
         }
 
         return (string) $this->module_name;
@@ -110,6 +178,8 @@ abstract class Module implements ModuleInterface
     }
 
     /**
+     * Get Description of Module
+     *
      * @return string
      */
     public function getModuleDescription(): string

@@ -7,33 +7,33 @@ use Apatis\Exceptions\Exception;
  * Class InvalidFileName
  * @package PentagonalProject\ProjectSeventh\Exceptions
  */
-class InvalidFileNameException extends Exception
+class InvalidPathException extends Exception
 {
     /**
      * @var string
      */
-    protected $file;
+    protected $path;
 
     /**
-     * InvalidFileNameException constructor.
-     * @param string $file
+     * InvalidPathException constructor.
+     * @param string $path
      * @param string $message
      */
-    public function __construct(string $file, string $message = '')
+    public function __construct(string $path, string $message = '')
     {
-        $this->file =  $file;
+        $this->path =  $path;
         if (func_num_args() > 1) {
             $this->message = $message;
         } else {
-            $this->message = "Invalid file of {$this->file}";
+            $this->message = "Invalid path of {$this->file}";
         }
     }
 
     /**
      * @return string
      */
-    public function getFileSet() : string
+    public function getPath() : string
     {
-        return $this->file;
+        return $this->path;
     }
 }

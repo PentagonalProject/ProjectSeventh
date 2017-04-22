@@ -2,9 +2,9 @@
 namespace PentagonalProject\ProjectSeventh\Exceptions;
 
 /**
- * Class EmptyFileException
+ * Class ModuleNotFoundException
  * @package PentagonalProject\ProjectSeventh\Exceptions
  */
-class EmptyFileException extends InvalidPathException
+class ModuleNotFoundException extends InvalidPathException
 {
 }

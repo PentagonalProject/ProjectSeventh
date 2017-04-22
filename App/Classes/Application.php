@@ -84,9 +84,17 @@ class Application
     {
         $this->slim = new App(
             [
+                'module'   => function($c) {
+                    return (new ModuleCollection($c['settings']['directory']['module']))->scan();
+                },
+                'config' => function($c) {
+                    $this->config = new Config($c['settings']);
+                    return $this->config;
+                },
                 'settings' => $this->config->get()
             ]
         );
-        return $this->slim;
+
+        return $this->slim->run();
     }
 }
