@@ -43,7 +43,7 @@ class Application
     /**
      * @return string
      */
-    public function getRootDirectory()
+    public function getRootDirectory() : string
     {
         return $this->rootDirectory;
     }
@@ -51,7 +51,7 @@ class Application
     /**
      * @return string
      */
-    public function getAppDirectory()
+    public function getAppDirectory() : string
     {
         return $this->appDirectory;
     }
@@ -61,7 +61,7 @@ class Application
      *
      * @param $config
      */
-    protected function init($config)
+    protected function init(array $config)
     {
         $config['directory'] = isset($config['directory']) ? $config['directory'] : [];
         if (!is_array($config['directory'])) {

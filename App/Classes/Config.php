@@ -62,7 +62,7 @@ class Config
     /**
      * @return CollectionFetch
      */
-    public function getCurrentCollection()
+    public function getCurrentCollection() : CollectionFetch
     {
         return $this->collection;
     }
@@ -70,7 +70,7 @@ class Config
     /**
      * @return CollectionFetch
      */
-    public function getDefaultCollection()
+    public function getDefaultCollection() : CollectionFetch
     {
         return $this->originalCollection;
     }
@@ -78,7 +78,7 @@ class Config
     /**
      * @return CollectionFetch
      */
-    public function getLastCollection()
+    public function getLastCollection() : CollectionFetch
     {
         return $this->lastCollection ?: $this->collection;
     }

@@ -41,7 +41,7 @@ final class AutoLoaderClass
      * @param string       $nameSpace
      * @param string|array $directory
      */
-    public function __construct($nameSpace, $directory)
+    public function __construct(string $nameSpace, string $directory)
     {
         $this->nameSpace = $this->resolveNameSpace($nameSpace);
         $this->baseDirectory = (array) $directory;
@@ -50,7 +50,7 @@ final class AutoLoaderClass
     /**
      * @return array
      */
-    public static function getReferences()
+    public static function getReferences() : array
     {
         return self::$references;
     }
@@ -58,7 +58,7 @@ final class AutoLoaderClass
     /**
      * @return string[] class map with lower case key
      */
-    public function getClassMap()
+    public function getClassMap() : array
     {
         return $this->classMap;
     }
@@ -69,7 +69,7 @@ final class AutoLoaderClass
      * @param string $string
      * @return string
      */
-    protected function resolveNameSpace($string)
+    protected function resolveNameSpace(string $string) : string
     {
         return preg_replace(
             '`(\\\)+`',
@@ -84,7 +84,7 @@ final class AutoLoaderClass
      * @param string $string
      * @return string
      */
-    protected function resolveNameSpaceLower($string)
+    protected function resolveNameSpaceLower($string) : string
     {
         return $this->toLower($this->resolveNameSpace($string));
     }
@@ -95,7 +95,7 @@ final class AutoLoaderClass
      * @param string $string
      * @return string
      */
-    protected function toLower($string)
+    protected function toLower($string) : string
     {
         // sanity case insensitive class
         return strtolower($string);
@@ -109,7 +109,7 @@ final class AutoLoaderClass
      * @param string $file  the absolute file
      * @return bool|string
      */
-    private function pushReference($group, $class, $file)
+    private function pushReference(string $group, string $class, string $file)
     {
         if ($file = stream_resolve_include_path($file)) {
             // references name space
@@ -127,16 +127,18 @@ final class AutoLoaderClass
     }
 
     /**
+     * Load Class
+     *
      * @param string $class
      * @return bool
      */
-    public function load($class)
+    public function load(string $class) : bool
     {
         if (!is_string($class)) {
             return false;
         }
         if ($file = $this->findFileFor($class)) {
-            // prevent multiple call instanphpfastcachece of class
+            // prevent multiple call of class
             if (class_exists($class)) {
                 return true;
             }
@@ -153,9 +155,9 @@ final class AutoLoaderClass
      *
      * @param string       $nameSpace
      * @param string|array $directory
-     * @return static
+     * @return AutoLoaderClass
      */
-    public static function create($nameSpace, $directory)
+    public static function create(string $nameSpace, string $directory) : AutoLoaderClass
     {
         return new static($nameSpace, $directory);
     }
@@ -167,7 +169,7 @@ final class AutoLoaderClass
      * @param string|array $directory directory to scan
      * @return bool
      */
-    public static function createRegister($nameSpace, $directory)
+    public static function createRegister(string $nameSpace, string $directory) : bool
     {
         return (new static($nameSpace, $directory))->register();
     }
@@ -188,7 +190,7 @@ final class AutoLoaderClass
      * @param bool $prepend
      * @return bool
      */
-    public function register($prepend = false)
+    public function register(bool $prepend = false) : bool
     {
         return spl_autoload_register($this, true, $prepend);
     }
@@ -207,7 +209,7 @@ final class AutoLoaderClass
      * @param string $Class
      * @return bool|string
      */
-    protected function findFileFor($Class)
+    protected function findFileFor(string $Class)
     {
         $Class = $this->resolveNameSpace($Class);
         $class = $this->toLower($Class);
@@ -224,6 +226,7 @@ final class AutoLoaderClass
             return $file;
         }
 
+        $file = false;
         $namespace= $this->resolveNameSpaceLower($this->nameSpace);
         foreach ($this->baseDirectory as $directory) {
             if (!is_string($directory) || ! ($directory = realpath($directory))) {
@@ -254,7 +257,7 @@ final class AutoLoaderClass
      * @param string $class
      * @return array
      */
-    protected function splitClassNameSpace($class)
+    protected function splitClassNameSpace(string $class) : array
     {
         $class     = $this->resolveNameSpace($class);
         $nameSpaceArray = explode('\\', $class);
@@ -275,7 +278,7 @@ final class AutoLoaderClass
      * @param string $class
      * @return bool|array
      */
-    protected function getClassReference($class)
+    protected function getClassReference(string $class)
     {
         // check if not as a class
         if (!$class || substr($class, -1) == '\\') {
@@ -296,7 +299,7 @@ final class AutoLoaderClass
      * @param string $group
      * @return bool|mixed
      */
-    protected function getGroupReference($group)
+    protected function getGroupReference(string $group)
     {
         if ($this->hasGroupReference($group)) {
             return AutoLoaderClass::$references[$this->resolveNameSpace($group)];
@@ -311,7 +314,7 @@ final class AutoLoaderClass
      * @param string $group
      * @return bool
      */
-    protected function hasGroupReference($group)
+    protected function hasGroupReference(string $group) : bool
     {
         $group = $this->resolveNameSpaceLower($group);
         return isset(self::$references[$group]);
@@ -320,7 +323,7 @@ final class AutoLoaderClass
     /**
      * @param $class
      */
-    public function __invoke($class)
+    public function __invoke(string $class)
     {
         call_user_func_array([$this, 'load'], func_get_args());
     }
@@ -329,7 +332,7 @@ final class AutoLoaderClass
 /**
  * @param string $file
  */
-function IncludeFileOnce($file)
+function IncludeFileOnce(string $file)
 {
     /** @noinspection PhpIncludeInspection */
     include_once $file;

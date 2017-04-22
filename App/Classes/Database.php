@@ -252,7 +252,7 @@ class Database
      *
      * @return Connection
      */
-    public function getConnection()
+    public function getConnection() : Connection
     {
         return $this->currentConnection;
     }
@@ -262,7 +262,7 @@ class Database
      *
      * @return string
      */
-    public function getTablePrefix()
+    public function getTablePrefix() : string
     {
         return $this->currentTablePrefix;
     }
@@ -272,7 +272,7 @@ class Database
      *
      * @return string
      */
-    public function getQuoteIdentifier()
+    public function getQuoteIdentifier() : string
     {
         return $this->currentQuoteIdentifier;
     }
@@ -282,7 +282,7 @@ class Database
      *
      * @return array
      */
-    public function getUserParams()
+    public function getUserParams() : array
     {
         return $this->currentUserParams;
     }
@@ -292,7 +292,7 @@ class Database
      *
      * @return array
      */
-    public function getConnectionParams()
+    public function getConnectionParams() : array
     {
         return $this->getParams();
     }
@@ -305,7 +305,7 @@ class Database
      * @final
      * @return bool|string return lowercase an fix database driver for Connection
      */
-    final public function sanitizeSelectedAvailableDriver($driverName)
+    final public function sanitizeSelectedAvailableDriver(string $driverName)
     {
         if (is_string($driverName) && trim($driverName)) {
             $driverName = trim(strtolower($driverName));
@@ -451,7 +451,7 @@ class Database
      * @param  string $table the table
      * @return string
      */
-    private function prefixTableCallback($table)
+    private function prefixTableCallback(string $table) : string
     {
         $prefix = $this->getTablePrefix();
         if (!empty($prefix) && is_string($prefix) && trim($prefix)) {
@@ -470,7 +470,7 @@ class Database
      * @param bool  $use_identifier
      * @return array|null|string
      */
-    public function prefixTables($table, $use_identifier = false)
+    public function prefixTables($table, bool $use_identifier = false)
     {
         if ($table instanceof \Closure || is_resource($table)) {
             throw new \InvalidArgumentException(
@@ -530,7 +530,7 @@ class Database
      * @param bool  $use_identifier
      * @return mixed
      */
-    public function prefix($tables, $use_identifier = false)
+    public function prefix($tables, bool $use_identifier = false)
     {
         return $this->prefixTables($tables, $use_identifier);
     }
@@ -543,7 +543,7 @@ class Database
      * @param   array  $binds array of bind data
      * @return  mixed
      */
-    public function compileBindsQuestionMark($sql, $binds = null)
+    public function compileBindsQuestionMark(string $sql, $binds = null)
     {
         if (empty($binds) || strpos($sql, '?') === false) {
             return $sql;
@@ -599,7 +599,7 @@ class Database
      * @return Statement
      * @throws DBALException
      */
-    public function queryBind($sql, $statement = null)
+    public function queryBind(string $sql, $statement = null)
     {
         $sql = $this->compileBindsQuestionMark($sql, $statement);
         if ($sql === false) {
@@ -633,7 +633,7 @@ class Database
      * @return string
      * @throws \InvalidArgumentException
      */
-    protected function tableMaybeInvalid($tableName)
+    protected function tableMaybeInvalid($tableName) : string
     {
         if (!is_string($tableName)) {
             throw new \InvalidArgumentException(
@@ -658,7 +658,7 @@ class Database
      *
      * @return array
      */
-    public function listDatabases()
+    public function listDatabases() : array
     {
         return $this->getSchemaManager()->listDatabases();
     }
@@ -668,7 +668,7 @@ class Database
      *
      * @return array
      */
-    public function listNamespaceNames()
+    public function listNamespaceNames() : array
     {
         return $this->getSchemaManager()->listDatabases();
     }
@@ -678,7 +678,7 @@ class Database
      *
      * @return Sequence[]
      */
-    public function listSequences()
+    public function listSequences() : array
     {
         return $this->getSchemaManager()->listSequences();
     }
@@ -689,7 +689,7 @@ class Database
      * @param string $tableName
      * @return Column[]
      */
-    public function listTableColumns($tableName)
+    public function listTableColumns(string $tableName) : array
     {
         $tableName = $this->tableMaybeInvalid($tableName);
         return $this
@@ -706,7 +706,7 @@ class Database
      *
      * @return Index[]
      */
-    public function listTableIndexes($tableName)
+    public function listTableIndexes(string $tableName) : array
     {
         $tableName = $this->tableMaybeInvalid($tableName);
         return $this
@@ -768,7 +768,7 @@ class Database
      *
      * @return Table
      */
-    public function listTableDetails($tableName)
+    public function listTableDetails(string $tableName)
     {
         $tableName = $this->tableMaybeInvalid($tableName);
         return $this->getSchemaManager()->listTableDetails($tableName);
@@ -791,7 +791,7 @@ class Database
      *
      * @return ForeignKeyConstraint[]
      */
-    public function listTableForeignKeys($tableName)
+    public function listTableForeignKeys(string $tableName)
     {
         $tableName = $this->tableMaybeInvalid($tableName);
         return $this->getSchemaManager()->listTableForeignKeys($tableName);
@@ -809,7 +809,7 @@ class Database
      * @return mixed
      * @throws DBALException
      */
-    public function __call($method, array $arguments)
+    public function __call(string $method, array $arguments)
     {
         /**
          * check if method exists on connection @see Connection !
