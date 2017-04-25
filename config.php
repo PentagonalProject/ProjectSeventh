@@ -6,6 +6,7 @@ return [
     'directory' => [
         'storage' => __DIR__ . DIRECTORY_SEPARATOR . 'Storage',
         'module'  => __DIR__ . DIRECTORY_SEPARATOR . 'Modules',
+        'extension' => __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'extensions',
     ],
     'database' => [
         'host'     => 'localhost',

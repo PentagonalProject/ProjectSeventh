@@ -4,10 +4,10 @@ namespace PentagonalProject\ProjectSeventh;
 use PentagonalProject\ProjectSeventh\Abstracts\EmbeddedSystem;
 
 /**
- * Class Module
+ * Class Extension
  * @package PentagonalProject\ProjectSeventh
  * @abstract
  */
-abstract class Module extends EmbeddedSystem
+abstract class Extension extends EmbeddedSystem
 {
 }

@@ -4,6 +4,8 @@ namespace PentagonalProject\ProjectSeventh;
 /**
  * Class AutoLoaderClass
  * @package PentagonalProject\ProjectSeventh
+ *
+ * PSR-4 Auto Loader
  */
 final class AutoLoaderClass
 {

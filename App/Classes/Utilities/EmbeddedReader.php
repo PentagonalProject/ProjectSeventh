@@ -1,18 +1,19 @@
 <?php
-namespace PentagonalProject\ProjectSeventh;
+namespace PentagonalProject\ProjectSeventh\Utilities;
 
 use Apatis\Exceptions\Exception;
 use Apatis\Exceptions\InvalidArgumentException;
 use Apatis\Exceptions\RuntimeException;
+use PentagonalProject\ProjectSeventh\Abstracts\EmbeddedSystem;
 use PentagonalProject\ProjectSeventh\Exceptions\EmptyFileException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidPathException;
-use PentagonalProject\ProjectSeventh\Exceptions\InvalidModuleException;
+use PentagonalProject\ProjectSeventh\Exceptions\InvalidEmbeddedException;
 
 /**
- * Class ModuleReader
- * @package PentagonalProject\ProjectSeventh
+ * Class EmbeddedReader
+ * @package PentagonalProject\ProjectSeventh\Utilities
  */
-class ModuleReader
+class EmbeddedReader
 {
     /**
      * @var bool
@@ -25,22 +26,45 @@ class ModuleReader
     protected $file = false;
 
     /**
-     * @var Module
+     * @var EmbeddedSystem
      */
     protected $instance;
 
     /**
      * @var string
      */
-    protected $moduleClass;
+    protected $embeddedClass = EmbeddedSystem::class;
 
     /**
-     * ModuleReader constructor.
-     * @param string $file
+     * @var string
      */
-    public function __construct(string $file)
+    protected $name = 'Embed';
+
+    /**
+     * EmbeddedReader constructor.
+     */
+    final public function __construct()
     {
-        $this->moduleClass = Module::class;
+    }
+
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set File
+     *
+     * @param string $file
+     * @return EmbeddedReader
+     */
+    protected function setFileToLoad(string $file) : EmbeddedReader
+    {
         if (file_exists($file)) {
             $spl = new \SplFileInfo($file);
             if ($spl->isLink()) {
@@ -58,20 +82,38 @@ class ModuleReader
 
             if (strtolower($spl->getExtension()) !== 'php') {
                 throw new InvalidArgumentException(
-                    "Module file has invalid extension. Extension must be as `php`",
+                    sprintf(
+                        "%s file has invalid extension. Extension must be as `php`",
+                        $this->getName()
+                    ),
                     E_WARNING
                 );
             }
 
             $this->file = $spl->getRealPath();
             unset($spl);
-            return;
+            return $this;
         }
 
         throw new InvalidArgumentException(
-            "Invalid file Module to read",
+            sprintf(
+                "Invalid file %s to read.",
+                $this->getName()
+            ),
             E_WARNING
         );
+    }
+
+    /**
+     * Create Instance EmbeddedReader
+     *
+     * @param string $file
+     * @return static
+     */
+    public static function create(string $file)
+    {
+        $static = new static();
+        return $static->setFileToLoad($file);
     }
 
     /**
@@ -103,7 +145,7 @@ class ModuleReader
     }
 
     /**
-     * @return Module|null
+     * @return EmbeddedSystem|null
      */
     public function getInstance()
     {
@@ -111,11 +153,11 @@ class ModuleReader
     }
 
     /**
-     * @return ModuleReader
+     * @return EmbeddedReader
      * @throws InvalidPathException
      * @throws Exception
      */
-    public function process() : ModuleReader
+    public function process() : EmbeddedReader
     {
         if (!$this->getFile()) {
             $this->valid = false;
@@ -142,27 +184,32 @@ class ModuleReader
     /**
      * Validate
      *
-     * @return ModuleReader
+     * @return EmbeddedReader
      * @throws EmptyFileException
-     * @throws InvalidModuleException
+     * @throws InvalidEmbeddedException
      */
-    private function validate() : ModuleReader
+    private function validate() : EmbeddedReader
     {
-        if (!is_string($this->moduleClass)) {
+        if (!is_string($this->embeddedClass)) {
             throw new RuntimeException(
-                "Invalid Parent Module Class. Module extends must be as class name and string."
+                sprintf(
+                    'Invalid Parent %s Class. %s extends must be as class name and string.',
+                    $this->getName()
+                ),
+                E_COMPILE_ERROR
             );
         }
 
-        $this->moduleClass = rtrim($this->moduleClass, '\\');
-        if (!class_exists($this->moduleClass)
-            || strtolower($this->moduleClass) != strtolower(Module::class)
-                && ! is_subclass_of($this->moduleClass, Module::class)
+        $this->embeddedClass = rtrim($this->embeddedClass, '\\');
+        if (!class_exists($this->embeddedClass)
+            || strtolower($this->embeddedClass) != strtolower(EmbeddedSystem::class)
+                && ! is_subclass_of($this->embeddedClass, EmbeddedSystem::class)
         ) {
             throw new RuntimeException(
                 sprintf(
-                    "Parent Module class Does not extends into %s",
-                    Module::class
+                    'Parent %1$s class does not extends into %2$s',
+                    $this->getName(),
+                    EmbeddedSystem::class
                 )
             );
         }
@@ -181,8 +228,11 @@ class ModuleReader
         }
 
         if (strtolower(substr($content, 0, 5)) !== '<?php') {
-            throw new InvalidModuleException(
-                "Invalid module, module does not start with open php tag.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'Invalid %s, %s does not start with open php tag.',
+                    $this->getName()
+                ),
                 E_ERROR
             );
         }
@@ -192,8 +242,11 @@ class ModuleReader
             && !empty($namespaces['namespace'])
         ) {
             if (strtolower(trim($namespaces['namespace'])) == strtolower(__NAMESPACE__)) {
-                throw new InvalidModuleException(
-                    "File Module contain name space of core.",
+                throw new InvalidEmbeddedException(
+                    sprintf(
+                        'File %s contain name space of core.',
+                        $this->getName()
+                    ),
                     E_ERROR
                 );
             }
@@ -201,16 +254,19 @@ class ModuleReader
         }
 
         if ($namespace !== '\\' && preg_match('`[^\\_a-z0-9]`', $namespace)) {
-            throw new InvalidModuleException(
-                "File Module contain invalid name space.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %s contain invalid name space.',
+                    $this->getName()
+                ),
                 E_ERROR
             );
         }
 
-        $moduleClass = $this->moduleClass;
+        $embeddedClass = $this->embeddedClass;
         preg_match(
             '/use\s+
-                (?:\\\{1})?(?P<extended>'.preg_quote($moduleClass, '/').')
+                (?:\\\{1})?(?P<extended>'.preg_quote($embeddedClass, '/').')
                 (?:\s+as\s+(?P<alias>[a-z0-9_]+))?;+
             /smx',
             $content,
@@ -237,7 +293,7 @@ class ModuleReader
 
         $regexNameSpace = $alias
             ? '(?P<extends>('.preg_quote("{$alias}", '/').'))\s*'
-            : '(?P<extends>('.preg_quote("\\{$moduleClass}", '/') . '|' . preg_quote($alias, '/').'))\s*';
+            : '(?P<extends>('.preg_quote("\\{$embeddedClass}", '/') . '|' . preg_quote($alias, '/').'))\s*';
         preg_match(
             '`class\s+
                     (?P<class>[a-z_][a-z0-9\_]+)
@@ -249,22 +305,32 @@ class ModuleReader
         );
 
         if (empty($class['class']) || empty($class['extends'])) {
-            throw new InvalidModuleException(
-                "File Module does not contain valid class or not extends to `{$moduleClass}`.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %1$s does not contain valid class or not extends to `%2$s`.',
+                    $this->getName(),
+                    $embeddedClass
+                ),
                 E_ERROR
             );
         }
 
         if (strtolower(pathinfo($this->file, PATHINFO_FILENAME)) !== strtolower($class['class'])) {
-            throw new InvalidModuleException(
-                "File Module does not match between file name & class.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %s does not match between file name & class.',
+                    $this->getName()
+                ),
                 E_ERROR
             );
         }
 
         if (! preg_match('/(public\s+)?function\s+init\([^\)]*\)\s*\{/smi', $content, $match)) {
-            throw new InvalidModuleException(
-                "File Module does not contain method `init`.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %s does not contain method `init`.',
+                    $this->getName()
+                ),
                 E_ERROR
             );
         }
@@ -275,8 +341,12 @@ class ModuleReader
 
         // prevent multiple include file if class has been loaded
         if (class_exists($class)) {
-            throw new InvalidModuleException(
-                "Object class {$class} for module has been loaded.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'Object class %1$s for %2$s has been loaded.',
+                    $class,
+                    $this->getName()
+                ),
                 E_ERROR
             );
         }
@@ -289,16 +359,23 @@ class ModuleReader
         if ($error = error_get_last() && !empty($error) && $error['file'] == $this->file) {
             if ($error['type'] === E_ERROR) {
                 @ob_end_clean();
-                throw new InvalidModuleException(
-                    "File Module contains fatal error.",
+                throw new InvalidEmbeddedException(
+                    sprintf(
+                        'File %s contains fatal error.',
+                        $this->getName()
+                    ),
                     E_ERROR
                 );
             }
         }
         @ob_end_clean();
         if (!class_exists($class)) {
-            throw new InvalidModuleException(
-                "File Module does not contain class {$class}.",
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %1$s does not contain class %2$s.',
+                    $this->getName(),
+                    $class
+                ),
                 E_ERROR
             );
         }

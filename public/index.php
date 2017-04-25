@@ -108,6 +108,6 @@ EOF;
     exit(E_CORE_ERROR);
 }
 
+// Require Composer Autoload
 require __DIR__ . '/../vendor/autoload.php';
-
-return (new PentagonalProject\ProjectSeventh\Application((array) require __DIR__. '/../config.php'))->run();
+return (new PentagonalProject\ProjectSeventh\Application((array) require __DIR__. '/../config.php'))->process();

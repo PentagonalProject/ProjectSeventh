@@ -1,10 +1,12 @@
 <?php
 namespace PentagonalProject\ProjectSeventh\Exceptions;
 
+use Apatis\Exceptions\Exception;
+
 /**
- * Class ModuleNotFoundException
+ * Class InvalidEmbeddedException
  * @package PentagonalProject\ProjectSeventh\Exceptions
  */
-class ModuleNotFoundException extends InvalidPathException
+class InvalidEmbeddedException extends Exception
 {
 }

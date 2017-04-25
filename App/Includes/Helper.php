@@ -49,14 +49,15 @@ function getWebServerSoftWare()
             $type =  IIS7_SERVER;
         }
     }
+    if (function_exists('apache_get_modules')) {
+        if (in_array('mod_security', apache_get_modules())) {
+            $type = APACHE_SERVER;
+        }
 
-    if (! $type
-        && (
-            function_exists('apache_get_modules')
-            || function_exists('apache_get_version')
-        )
-    ) {
-        $type = APACHE_SERVER;
+        if (!$type && function_exists('apache_get_version')
+        ) {
+            $type = APACHE_SERVER;
+        }
     }
 
     return $type;

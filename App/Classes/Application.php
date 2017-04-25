@@ -1,7 +1,11 @@
 <?php
 namespace PentagonalProject\ProjectSeventh;
 
+use Apatis\Exceptions\LogicException;
+use PentagonalProject\ProjectSeventh\Utilities\EmbeddedCollection;
 use Slim\App;
+use Slim\Container;
+use Slim\Http\Environment;
 
 /**
  * Class Application
@@ -30,6 +34,11 @@ class Application
     protected $slim;
 
     /**
+     * @var bool
+     */
+    protected $hasRun;
+
+    /**
      * Application constructor.
      * @param array $config
      */
@@ -41,6 +50,8 @@ class Application
     }
 
     /**
+     * Get Root Directory
+     *
      * @return string
      */
     public function getRootDirectory() : string
@@ -49,6 +60,8 @@ class Application
     }
 
     /**
+     * Get Application Directory
+     *
      * @return string
      */
     public function getAppDirectory() : string
@@ -61,15 +74,16 @@ class Application
      *
      * @param $config
      */
-    protected function init(array $config)
+    protected function init(array &$config)
     {
         $config['directory'] = isset($config['directory']) ? $config['directory'] : [];
         if (!is_array($config['directory'])) {
             $config['directory'] =  [];
         }
         $config['directory'] = array_merge([
-            'module' => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Modules',
-            'storage' => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Storage'
+            'extension' => WEB_ROOT . DIRECTORY_SEPARATOR . 'extensions',
+            'module'    => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Modules',
+            'storage'   => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Storage',
         ], $config['directory']);
 
         $config['httpVersion'] = isset($_SERVER['SERVER_PROTOCOL'])
@@ -80,21 +94,96 @@ class Application
         $this->config = new Config($config);
     }
 
-    public function run()
+    /**
+     * Run The application
+     *
+     * @return Application
+     */
+    public function process()
     {
+        if ($this->hasRun) {
+            throw new LogicException(
+                'Application has been run! Please does not re run the application procedure.',
+                E_ERROR
+            );
+        }
+
+        $c =& $this;
         $this->slim = new App(
             [
-                'module'   => function($c) {
-                    return (new ModuleCollection($c['settings']['directory']['module']))->scan();
+                /**
+                 * Application Instance
+                 *
+                 * Use on closure prevent being binding to
+                 * @return Application
+                 */
+                'application' => function () use (&$c) : Application {
+                    return $c;
                 },
-                'config' => function($c) {
-                    $this->config = new Config($c['settings']);
-                    return $this->config;
+                /**
+                 * Configuration Container
+                 *
+                 * Use on closure prevent being binding to
+                 * @return Config
+                 */
+                'config' => function () use (&$c) : Config {
+                    return $c->config;
                 },
-                'settings' => $this->config->get()
+                /**
+                 * Closure
+                 *
+                 * @return Database
+                 */
+                'database'    => require_once dirname(__DIR__) . '/Containers/Database.php',
+                /**
+                 * Closure
+                 *
+                 * @return Environment
+                 */
+                'environment' => require dirname(__DIR__) . '/Containers/Environment.php',
+                /**
+                 * Module Container
+                 *
+                 * Closure
+                 *
+                 * @return EmbeddedCollection
+                 */
+                'module'      => require_once dirname(__DIR__) . '/Containers/Module.php',
+                /**
+                 * Extension Container
+                 *
+                 * Closure
+                 *
+                 * @return EmbeddedCollection
+                 */
+                'extension'    => require_once dirname(__DIR__) . '/Containers/Extension.php',
+                /**
+                 * @return array
+                 */
+                'settings'    => require dirname(__DIR__) . '/Containers/Settings.php',
+                /**
+                 * Slim Inheritance
+                 *
+                 * @return App
+                 */
+                'slim'        => function () use (&$c) : App {
+                    return $c->slim;
+                }
             ]
         );
 
-        return $this->slim->run();
+        $this->hasRun = true;
+        $this->slim->any('/[{param: .+}]', function($request, $response) {
+            /** @var EmbeddedCollection $module */
+            $module = $this['module'];
+            $ret = print_r($module, true);
+            $body = $response->getBody();
+            $body->write($ret);
+            $response->withBody($body);
+            return $response;
+        });
+        $this->slim->run();
+
+        return $this;
     }
 }
