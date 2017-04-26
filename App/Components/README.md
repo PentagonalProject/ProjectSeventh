@@ -2,6 +2,6 @@
 
 Contains Component for file includes on: 
 
-Application file on : [Application.php](../Classes/Application.php#L232)
+Application file on : [Application.php](../Classes/Application.php#L283)
 
 on method `process(array $config)`
