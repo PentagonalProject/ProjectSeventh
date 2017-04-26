@@ -21,11 +21,11 @@ class InvalidPathException extends Exception
      */
     public function __construct(string $path, string $message = '')
     {
-        $this->path =  $path;
+        $this->path = $path;
         if (func_num_args() > 1) {
             $this->message = $message;
         } else {
-            $this->message = "Invalid path of {$this->file}";
+            $this->message = "Invalid path of {$path}";
         }
     }
 

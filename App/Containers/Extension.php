@@ -1,4 +1,8 @@
 <?php
+/* ------------------------------------------------------ *\
+ |                 CONTAINER EXTENSION                    |
+\* ------------------------------------------------------ */
+
 /**
  * File for Slim Container for 'module'
  */
@@ -15,7 +19,7 @@ namespace {
      * @var Container $c
      * @return EmbeddedCollection
      */
-    return function ($c) : EmbeddedCollection {
+    return function (Container $c) : EmbeddedCollection {
         /** @var Config $config */
         $config = $c['config'];
         $extensionCollection = new EmbeddedCollection(

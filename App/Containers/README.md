@@ -1,4 +1,8 @@
-## DO NOT CHANGE ANYTHING HERE!!
+## CONTAINER
+
+```
+### DO NOT CHANGE ANYTHING HERE!! ###
+```
 
 Creating Container file guide
 
@@ -28,3 +32,17 @@ namespace {
     };
 }
 ```
+
+### NOTE
+
+- Context Container can be access this, but it will be returning :
+
+`object \PentagonalProject\ProjectSeventh\Arguments`
+
+- Get Instance application use the :
+
+`$this[\PentagonalProject\ProjectSeventh\Application::APP_KEY]` 
+
+or
+
+`$this->get(\PentagonalProject\ProjectSeventh\Application::APP_KEY)`

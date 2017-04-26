@@ -2,11 +2,17 @@
 /* ------------------------------------------------------ *\
  |                        CONFIG                          |
 \* ------------------------------------------------------ */
+/**
+ * Use @const WEB_ROOT to get Public / Web Directory
+ */
 return [
     'directory' => [
-        'storage' => __DIR__ . DIRECTORY_SEPARATOR . 'Storage',
-        'module'  => __DIR__ . DIRECTORY_SEPARATOR . 'Modules',
-        'extension' => __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'extensions',
+        'storage'   => __DIR__ . DIRECTORY_SEPARATOR . 'Storage',
+        'module'    => __DIR__ . DIRECTORY_SEPARATOR . 'Modules',
+        'extension' => WEB_ROOT . DIRECTORY_SEPARATOR . 'extensions',
+        // load from example
+        // 'extension' => __DIR__ . DIRECTORY_SEPARATOR . '_example/Extensions',
+        // 'module'    => __DIR__ . DIRECTORY_SEPARATOR . '_example/Modules',
     ],
     'database' => [
         'host'     => 'localhost',
@@ -14,7 +20,8 @@ return [
         'password' => '',
         'name'     => '',
         'port'     => 3306,
-        'charset'  => 'utf-8',
+        'driver'   => 'mysql',
+        'charset'  => 'utf8',
         'collate'  => 'utf8_unicode_ci',
     ],
     'environment' => [
@@ -23,9 +30,13 @@ return [
         'log'     => true,
     ],
     'session'  => [
-        'path' => '/',
+        'name' => null,
         'save_path' => null,
-        'expire' => null,
-        'domain' => '*',
+        // values of cookie params
+        'path' => '/',
+        'lifetime' => 0,
+        'domain'   => null,
+        'httponly' => null,
+        'secure'   => null,
     ],
 ];

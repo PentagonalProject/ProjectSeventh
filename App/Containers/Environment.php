@@ -1,4 +1,8 @@
 <?php
+/* ------------------------------------------------------ *\
+ |                 CONTAINER ENVIRONMENT                  |
+\* ------------------------------------------------------ */
+
 /**
  * File for Slim Container for 'environment'
  * Override Default Environment to prevent infinity loop & detect proxy from cdn.

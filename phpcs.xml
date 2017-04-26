@@ -16,4 +16,5 @@
     <!-- Path To Check -->
     <file>App</file>
     <file>Modules</file>
+    <file>public</file>
 </ruleset>

@@ -4,22 +4,17 @@
 \* ------------------------------------------------------ */
 
 /**
- * define web root constant
- */
-define('WEB_ROOT', __DIR__);
-
-/**
- * Minimum Php Version is 7.0
+ * Minimum PHP Version is 7.0
  */
 if (version_compare(phpversion(), "7.0", "<")) {
     preg_match('`^\d+(\.\d+)*`', PHP_VERSION, $match);
     $content = sprintf("Minimum Requirement php version is 7.0 and %s given", $match[0]);
     if (php_sapi_name() !== 'cli') {
         $accept = isset($_SERVER['CONTENT_TYPE'])
-            ? array($_SERVER['CONTENT_TYPE'])
+            ? [$_SERVER['CONTENT_TYPE']]
             : ( isset($_SERVER['HTTP_ACCEPT'])
                 ? explode(',', $_SERVER['HTTP_ACCEPT'])
-                : array("text/html")
+                : ["text/html"]
             );
         $accept = strtolower($accept[0]);
         $current = null;
@@ -33,13 +28,14 @@ if (version_compare(phpversion(), "7.0", "<")) {
             case 'jason':
                 $accept = "application/json";
                 $content = json_encode(
-                    array(
-                        "error" => array(
+                    [
+                        "error" => [
                             "code"    => 500,
-                            "message" => array($content)
-                        )
-                    ),
-                    JSON_PRETTY_PRINT);
+                            "message" => [$content]
+                        ]
+                    ],
+                    JSON_PRETTY_PRINT
+                );
                 break;
             case 'xml':
                 $accept = "application/xml";
@@ -110,4 +106,8 @@ EOF;
 
 // Require Composer Autoload
 require __DIR__ . '/../vendor/autoload.php';
-return (new PentagonalProject\ProjectSeventh\Application((array) require __DIR__. '/../config.php'))->process();
+// if the composer that must not ../App/FunctionIncludes.php
+// try to includes once
+require_once __DIR__ .'/../App/FunctionsIncludes.php';
+return (new PentagonalProject\ProjectSeventh\Application())
+    ->process((array) require __DIR__. '/../config.php');

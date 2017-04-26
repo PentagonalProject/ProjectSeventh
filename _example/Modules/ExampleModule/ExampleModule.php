@@ -48,7 +48,7 @@ namespace {
          *
          * @var string
          */
-        protected $embedded_description = 'This Module Contains';
+        protected $embedded_description = 'This Module Description';
 
         /**
          * Doing init when module Loaded

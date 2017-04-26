@@ -1,11 +1,10 @@
 <?php
 namespace PentagonalProject\ProjectSeventh;
 
+use Apatis\Exceptions\InvalidArgumentException;
 use Apatis\Exceptions\LogicException;
-use PentagonalProject\ProjectSeventh\Utilities\EmbeddedCollection;
+use PentagonalProject\ProjectSeventh\Exceptions\FileNotFoundException;
 use Slim\App;
-use Slim\Container;
-use Slim\Http\Environment;
 
 /**
  * Class Application
@@ -14,19 +13,38 @@ use Slim\Http\Environment;
 class Application
 {
     /**
+     * Application Key Name Selector
+     *
+     * @var string
+     */
+    const APP_KEY = 'application';
+
+    /**
      * @var string
      */
     protected $rootDirectory;
 
     /**
-     * @var string
+     * @var string __DIR__
      */
     protected $appDirectory;
 
     /**
-     * @var Config
+     * Component Directory
+     *
+     * @var string
      */
-    protected $config;
+    protected $componentDirectory;
+
+    /**
+     * @var string
+     */
+    protected $webRootDirectory;
+
+    /**
+     * @var string
+     */
+    protected $containerDirectory;
 
     /**
      * @var App
@@ -39,67 +57,230 @@ class Application
     protected $hasRun;
 
     /**
-     * Application constructor.
-     * @param array $config
+     * @var string
      */
-    public function __construct(array $config)
+    protected $ds = DIRECTORY_SEPARATOR;
+
+    /**
+     * Application constructor.
+     */
+    public function __construct()
     {
         $this->appDirectory  = dirname(__DIR__);
+        $this->componentDirectory = $this->getAppDirectory('Components');
+        $this->containerDirectory = $this->getAppDirectory('Containers');
         $this->rootDirectory = dirname($this->appDirectory);
-        $this->init($config);
+        if (!defined('WEB_ROOT')) {
+            define('WEB_ROOT', dirname($_SERVER['SCRIPT_FILENAME']));
+        }
+        $this->webRootDirectory = $this->getFixPath(WEB_ROOT, false);
+    }
+
+    /**
+     * Returning Directory Separator
+     *
+     * @return string
+     */
+    public function getDS()
+    {
+        return $this->ds;
+    }
+
+    /**
+     * Fix Path Separator
+     *
+     * @param string $path
+     * @param bool   $useCleanPrefix
+     * @return string
+     */
+    public function getFixPath(string $path = '', $useCleanPrefix = false) : string
+    {
+        /**
+         * Trimming path string
+         */
+        if (($path = trim($path)) == '') {
+            return $path;
+        }
+
+        $path = preg_replace('`(\/|\\\)+`', $this->getDS(), $path);
+        if ($useCleanPrefix) {
+            $path = $this->getDS() . ltrim($path, $this->getDS());
+        }
+
+        return $path;
     }
 
     /**
      * Get Root Directory
      *
+     * @param string $path
      * @return string
      */
-    public function getRootDirectory() : string
+    public function getRootDirectory(string $path = '') : string
     {
-        return $this->rootDirectory;
+        return $this->rootDirectory . $this->getFixPath($path, true);
+    }
+
+    /**
+     * Get Web Root Directory
+     *
+     * @param string $path
+     * @return string
+     */
+    public function getWebRootDirectory(string $path = '') : string
+    {
+        return $this->webRootDirectory . $this->getFixPath($path, true);
     }
 
     /**
      * Get Application Directory
      *
+     * @param string $path
      * @return string
      */
-    public function getAppDirectory() : string
+    public function getAppDirectory(string $path = '') : string
     {
-        return $this->appDirectory;
+        return $this->appDirectory . $this->getFixPath($path, true);
     }
 
     /**
-     * Initialize
+     * Get Application Directory
      *
-     * @param $config
+     * @param string $path
+     * @return string
      */
-    protected function init(array &$config)
+    public function getContainerDirectory(string $path = '') : string
     {
-        $config['directory'] = isset($config['directory']) ? $config['directory'] : [];
-        if (!is_array($config['directory'])) {
-            $config['directory'] =  [];
+        return $this->containerDirectory . $this->getFixPath($path, true);
+    }
+
+    /**
+     * Get Application Component Directory
+     * @param string $path
+     * @return string
+     */
+    public function getComponentDirectory(string $path = '') : string
+    {
+        return $this->componentDirectory . $this->getFixPath($path, true);
+    }
+
+    /**
+     * Include Scope
+     *
+     * @param-read string $file
+     * @return mixed
+     * @throws FileNotFoundException
+     */
+    public function includeScope()
+    {
+        if (func_num_args() < 1) {
+            throw new InvalidArgumentException(
+                'Argument 1 could not be empty.',
+                E_USER_ERROR
+            );
         }
-        $config['directory'] = array_merge([
-            'extension' => WEB_ROOT . DIRECTORY_SEPARATOR . 'extensions',
-            'module'    => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Modules',
-            'storage'   => $this->getRootDirectory() .DIRECTORY_SEPARATOR . ' Storage',
-        ], $config['directory']);
 
-        $config['httpVersion'] = isset($_SERVER['SERVER_PROTOCOL'])
-            && strpos($_SERVER['SERVER_PROTOCOL'], '/') !== false
-            ? explode('/', $_SERVER['SERVER_PROTOCOL'])[1]
-            : '1.1';
+        if (!is_string(func_get_arg(0))) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Argument 1 must be as a string %s given.',
+                    gettype(func_get_arg(0))
+                ),
+                E_USER_ERROR
+            );
+        }
 
-        $this->config = new Config($config);
+        if (!($path = stream_resolve_include_path(func_get_arg(0)))) {
+            throw new FileNotFoundException(
+                func_get_arg(0)
+            );
+        }
+
+        /**
+         * closure include of scope to prevent access @uses Application
+         * bind to @uses Arguments
+         * if inside of include call $this it wil be access as @uses Arguments object
+         * @uses Application::APP_KEY to access application instance
+         * eg :
+         *  $this->get(Application::APP_KEY)
+         */
+        $args = func_get_args();
+        $args[self::APP_KEY] =& $this;
+        $fn = (function () {
+            /** @var Arguments $this */
+            /** @noinspection PhpIncludeInspection */
+            return include $this[0];
+        })->bindTo(new Arguments($args));
+
+        return $fn();
+    }
+
+    /**
+     * Include Scope
+     *
+     * @param-read string $file
+     * @return mixed
+     * @throws FileNotFoundException
+     */
+    public function includeScopeOnce()
+    {
+        if (func_num_args() < 1) {
+            throw new InvalidArgumentException(
+                'Argument 1 could not be empty.',
+                E_USER_ERROR
+            );
+        }
+
+        if (!is_string(func_get_arg(0))) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Argument 1 must be as a string %s given.',
+                    gettype(func_get_arg(0))
+                ),
+                E_USER_ERROR
+            );
+        }
+
+        if (!($path = stream_resolve_include_path(func_get_arg(0)))) {
+            throw new FileNotFoundException(
+                func_get_arg(0)
+            );
+        }
+
+        /**
+         * closure include of scope to prevent access @uses Application
+         * bind to @uses Arguments
+         * if inside of include call $this it wil be access as @uses Arguments object
+         * @uses Application::APP_KEY to access application instance
+         * eg :
+         *  $this->get(Application::APP_KEY)
+         */
+        $args = func_get_args();
+        $args[self::APP_KEY] =& $this;
+        $fn = (function () {
+            /** @var Arguments $this */
+            /** @noinspection PhpIncludeInspection */
+            return include_once $this[0];
+        })->bindTo(new Arguments($args));
+
+        return $fn();
+    }
+
+    /**
+     * @return App
+     */
+    public function &getSlim()
+    {
+        return $this->slim;
     }
 
     /**
      * Run The application
      *
+     * @param array $config
      * @return Application
      */
-    public function process()
+    public function process(array $config)
     {
         if ($this->hasRun) {
             throw new LogicException(
@@ -108,82 +289,16 @@ class Application
             );
         }
 
-        $c =& $this;
-        $this->slim = new App(
-            [
-                /**
-                 * Application Instance
-                 *
-                 * Use on closure prevent being binding to
-                 * @return Application
-                 */
-                'application' => function () use (&$c) : Application {
-                    return $c;
-                },
-                /**
-                 * Configuration Container
-                 *
-                 * Use on closure prevent being binding to
-                 * @return Config
-                 */
-                'config' => function () use (&$c) : Config {
-                    return $c->config;
-                },
-                /**
-                 * Closure
-                 *
-                 * @return Database
-                 */
-                'database'    => require_once dirname(__DIR__) . '/Containers/Database.php',
-                /**
-                 * Closure
-                 *
-                 * @return Environment
-                 */
-                'environment' => require dirname(__DIR__) . '/Containers/Environment.php',
-                /**
-                 * Module Container
-                 *
-                 * Closure
-                 *
-                 * @return EmbeddedCollection
-                 */
-                'module'      => require_once dirname(__DIR__) . '/Containers/Module.php',
-                /**
-                 * Extension Container
-                 *
-                 * Closure
-                 *
-                 * @return EmbeddedCollection
-                 */
-                'extension'    => require_once dirname(__DIR__) . '/Containers/Extension.php',
-                /**
-                 * @return array
-                 */
-                'settings'    => require dirname(__DIR__) . '/Containers/Settings.php',
-                /**
-                 * Slim Inheritance
-                 *
-                 * @return App
-                 */
-                'slim'        => function () use (&$c) : App {
-                    return $c->slim;
-                }
-            ]
+        // must be call it first
+        $this->slim = $this->includeScope(
+            $this->getComponentDirectory('ApplicationSlimObject.php'),
+            $config
         );
-
-        $this->hasRun = true;
-        $this->slim->any('/[{param: .+}]', function($request, $response) {
-            /** @var EmbeddedCollection $module */
-            $module = $this['module'];
-            $ret = print_r($module, true);
-            $body = $response->getBody();
-            $body->write($ret);
-            $response->withBody($body);
-            return $response;
-        });
+        // call middleware
+        $this->includeScope($this->getComponentDirectory('ApplicationMiddleware.php'));
+        // determine & call routes
+        $this->includeScope($this->getComponentDirectory('ApplicationRoutes.php'));
         $this->slim->run();
-
         return $this;
     }
 }

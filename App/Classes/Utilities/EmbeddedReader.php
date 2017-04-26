@@ -281,6 +281,11 @@ class EmbeddedReader
             $alias = end($asAlias['extended']);
         }
 
+        // remove declarations
+        if (stripos($content, 'declare') !== false) {
+            $content = preg_replace('`declare\s*\([^\)]+\)\s*\;\s*`smi', '', $content);
+        }
+
         // replace for unused text
         $content = preg_replace(
             [

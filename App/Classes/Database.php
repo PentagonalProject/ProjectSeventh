@@ -179,6 +179,13 @@ class Database
          * Merge User Param
          */
         $this->currentUserParams = array_merge($this->currentUserParams, $configs);
+        if (empty($this->currentUserParams['driver'])
+            && isset($this->currentUserParams['port'])
+            && $this->currentUserParams['port'] == 3306
+        ) {
+            $this->currentUserParams['driver'] = 'mysql';
+        }
+
         if (!isset($this->currentUserParams['driver'])) {
             throw new DBALException('Driver must be declare.', E_USER_ERROR);
         }
@@ -225,8 +232,38 @@ class Database
             }
             $this->currentUserParams['path'] = $this->currentUserParams['name'];
         }
+
         $this->currentUserParams['dbname'] = $this->currentUserParams['name'];
         unset($this->currentUserParams['name']);
+
+        if (is_string($this->currentUserParams['charset'])
+            && strpos($this->currentUserParams['charset'], '-')
+        ) {
+            $this->currentUserParams['charset'] = str_replace(
+                '-',
+                '',
+                trim(strtolower($this->currentUserParams['charset']))
+            );
+        }
+
+        if (!is_string($this->currentUserParams['charset'])
+            || trim($this->currentUserParams['charset']) == ''
+        ) {
+            $charset = 'utf8';
+            if (isset($this->currentUserParams['collate'])) {
+                $collate = $this->currentUserParams['collate'];
+                if (!is_string($collate)) {
+                    $collate = 'utf8_unicode_ci';
+                }
+                $collate = preg_replace('`(\-|\_)+`', '_', $collate);
+                $collate = trim(strtolower($collate));
+                $this->currentUserParams['collate'] = $collate;
+                $collateArray = explode('_', $collate);
+                $charset = reset($collateArray);
+            }
+
+            $this->currentUserParams['charset'] = $charset;
+        }
 
         /**
          * create new parameters
