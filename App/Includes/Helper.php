@@ -6,9 +6,9 @@
 /**
  * Get Web Server Type
  *
- * @return bool|string
+ * @return string
  */
-function getWebServerSoftWare()
+function getWebServerSoftWare() : string
 {
     static $type;
 
@@ -20,7 +20,7 @@ function getWebServerSoftWare()
         ? $_SERVER['SERVER_SOFTWARE']
         : null;
 
-    $type = false;
+    $type = UNKNOWN_SERVER;
 
     if (stripos($software, 'lighttpd') !== false) {
         $type = LIGHTTPD_SERVER;
@@ -54,7 +54,7 @@ function getWebServerSoftWare()
             $type = APACHE_SERVER;
         }
 
-        if (!$type && function_exists('apache_get_version')
+        if ($type == UNKNOWN_SERVER && function_exists('apache_get_version')
         ) {
             $type = APACHE_SERVER;
         }
@@ -68,7 +68,7 @@ function getWebServerSoftWare()
  *
  * @return bool
  */
-function isApache()
+function isApache() : bool
 {
     return in_array(getWebServerSoftWare(), [APACHE_SERVER, LITESPEED_SERVER]);
 }
@@ -78,7 +78,7 @@ function isApache()
  *
  * @return bool
  */
-function isLitespeed()
+function isLiteSpeed(): bool
 {
     return getWebServerSoftWare() === LIGHTTPD_SERVER;
 }
@@ -88,7 +88,7 @@ function isLitespeed()
  *
  * @return bool
  */
-function isNginx()
+function isNginx(): bool
 {
     return getWebServerSoftWare() === NGINX_SERVER;
 }
@@ -98,7 +98,7 @@ function isNginx()
  *
  * @return bool
  */
-function isHiawatha()
+function isHiawatha(): bool
 {
     return getWebServerSoftWare() === HIAWATHA_SERVER;
 }
@@ -108,7 +108,7 @@ function isHiawatha()
  *
  * @return bool
  */
-function isLighttpd()
+function isLighttpd() : bool
 {
     return getWebServerSoftWare() === LIGHTTPD_SERVER;
 }
@@ -118,7 +118,7 @@ function isLighttpd()
  *
  * @return bool
  */
-function isIIS()
+function isIIS() : bool
 {
     return in_array(getWebServerSoftWare(), [IIS_SERVER, IIS7_SERVER]);
 }
@@ -128,7 +128,7 @@ function isIIS()
  *
  * @return bool
  */
-function isIIS7()
+function isIIS7() : bool
 {
     return getWebServerSoftWare() === IIS7_SERVER;
 }
@@ -138,7 +138,7 @@ function isIIS7()
  *
  * @return bool
  */
-function isMobile()
+function isMobile() : bool
 {
     if (empty($_SERVER['HTTP_USER_AGENT'])) {
         return false;

@@ -10,3 +10,4 @@ define('IIS_SERVER', 'iis');
 define('IIS7_SERVER', 'iis7');
 define('HIAWATHA_SERVER', 'hiawatha');
 define('LIGHTTPD_SERVER', 'lighttpd');
+define('UNKNOWN_SERVER', '');
