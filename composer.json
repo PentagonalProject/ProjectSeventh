@@ -2,7 +2,7 @@
     "name": "pentagonalproject/project-seventh",
     "description": "Project API Handler",
     "type": "project",
-    "version": "0.1.0-a",
+    "version": "0.1.0-alphaDev",
     "require": {
         "php": ">= 7",
         "apatis/array-storage": "^1",
