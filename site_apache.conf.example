@@ -1,0 +1,21 @@
+# Change 127.0.0.1 to IP
+<VirtualHost 127.0.0.1:80>
+    # Domain Name / Server
+    ServerName domain.cug
+
+    # Server Aliasing
+    ServerAlias domain.cug www.domain.cug
+
+    # Document Index Root Public
+    DocumentRoot /path/to/public
+
+    # Email For Server Admin
+    ServerAdmin admin@domain.cug
+
+    # Grant Of Directory
+    <Directory /path/to/public>
+	    Options Indexes FollowSymLinks
+        AllowOverride All
+	    Require all granted
+    </Directory>
+</VirtualHost>
