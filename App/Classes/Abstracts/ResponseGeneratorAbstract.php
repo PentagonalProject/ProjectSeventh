@@ -43,7 +43,7 @@ abstract class ResponseGeneratorAbstract
     /**
      * @var int
      */
-    protected $statusCode = 200;
+    protected $statusCode;
 
     /**
      * @var int
@@ -81,6 +81,24 @@ abstract class ResponseGeneratorAbstract
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEncoding(): int
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * @param int $encoding
+     * @return static
+     */
+    public function setEncoding(int $encoding)
+    {
+        $this->encoding = $encoding;
+        return $this;
     }
 
     /**
@@ -238,9 +256,8 @@ abstract class ResponseGeneratorAbstract
      * @uses $this->getMimeTypeFromExtension()
      * @return string
      */
-    protected function generateTheContentType()
+    protected function fixMimeType()
     {
-        $charset = $this->getCharset();
         $this->mimeType = !is_string($this->mimeType) || trim($this->mimeType) == ''
             ? 'text/html'
             : strtolower(trim($this->mimeType));
@@ -314,7 +331,16 @@ abstract class ResponseGeneratorAbstract
             }
         }
 
-        return $this->mimeType . ($charset ? ';charset=' . $charset : '');
+        return $this->mimeType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContentType() : string
+    {
+        $charset = $this->getCharset();
+        return $this->getMimeType() . ($charset ? ';charset=' . $charset : '');
     }
 
     /**
@@ -324,8 +350,7 @@ abstract class ResponseGeneratorAbstract
      */
     public function getMimeType()
     {
-        $this->generateTheContentType();
-        return $this->mimeType;
+        return $this->fixMimeType();
     }
 
     /**
@@ -337,16 +362,6 @@ abstract class ResponseGeneratorAbstract
     public function setMimeType(string $mimeType)
     {
         $this->mimeType = $mimeType;
-        return $this;
-    }
-
-    /**
-     * @param $encoding
-     * @return static
-     */
-    public function setEncoding($encoding)
-    {
-        $this->encoding = $encoding;
         return $this;
     }
 
