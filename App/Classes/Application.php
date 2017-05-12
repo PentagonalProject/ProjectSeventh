@@ -267,6 +267,8 @@ class Application
     }
 
     /**
+     * Get Run Slim Instance
+     *
      * @return App
      */
     public function &getSlim()

@@ -36,9 +36,9 @@ namespace {
         /** @var Application $application */
         $application = $container['application'];
         $config['directory'] = array_merge([
-            'extension' => $application->getWebRootDirectory('extensions'),
+            'extension' => $application->getRootDirectory('Extensions'),
             'module'    => $application->getRootDirectory('Modules'),
-            'storage'   => $application->getRootDirectory(' Storage'),
+            'storage'   => $application->getRootDirectory('Storage'),
         ], $config['directory']);
 
         return new Config($config);
