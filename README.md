@@ -83,3 +83,19 @@ WES NGONO AE YO WONG !!!
 (UWONG TA KEONG KOWE IKU MEDIT TEMEN?!)
 
 ```
+
+
+### PENTING JUGA
+
+```txt
+Ihhh .... tolong yaaa ...
+jelek - jelek gini ini script juga coding standard make
+PSR2 loh ....
+akika aja ampe bikin `phpcs.xml` ... pusiiiiing deh kepala eikee...
+emangnye itu file buat apaan?
+ih jijay deh kalo yey yey tara make `phpcbf` mending yey sanaaa !!!
+Pulang ke kandang kambing .. ihhhh
+
+Kalo tara coding standard, emangyaa eike cowok apakaahhh ...
+
+```
