@@ -1,0 +1,37 @@
+server {
+
+    # port
+    listen 80;
+
+    # host
+    server_name domain.cug;
+
+    # indexing
+    index index.php;
+
+    # root path for public
+    root /path/to/public;
+
+    # Disable Logging for error
+    access_log  /dev/null;
+    error_log /dev/null;
+
+    # Query File Indexing
+    location / {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    # NGinX Worker
+    location ~ \.php {
+        try_files $uri = 404;
+        # Fast CGI
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+        fastcgi_index index.php;
+
+        # listen for cgi param port
+        fastcgi_pass 127.0.0.1:9000;
+    }
+}
