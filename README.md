@@ -96,6 +96,6 @@ emangnye itu file buat apaan?
 ih jijay deh kalo yey yey tara make `phpcbf` mending yey sanaaa !!!
 Pulang ke kandang kambing .. ihhhh
 
-Kalo tara coding standard, emangyaa eike cowok apakaahhh ...
+Kalo tara coding standard, emangnyaa eike cowok apakaahhh ...
 
 ```
