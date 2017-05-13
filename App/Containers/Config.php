@@ -14,7 +14,7 @@ namespace {
     use PentagonalProject\ProjectSeventh\Config;
     use Slim\Container;
 
-    if (!isset($this) || ! $this instanceof  Arguments) {
+    if (!isset($this) || ! $this instanceof Arguments) {
         return;
     }
 
@@ -34,7 +34,7 @@ namespace {
 
     return function (Container $container) use (&$config) : Config {
         /** @var Application $application */
-        $application = $container['application'];
+        $application = $container[CONTAINER_APPLICATION];
         $config['directory'] = array_merge([
             'extension' => $application->getRootDirectory('Extensions'),
             'module'    => $application->getRootDirectory('Modules'),
