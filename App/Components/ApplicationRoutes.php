@@ -14,7 +14,7 @@ namespace {
     }
 
     /** @var Application $c */
-    $c =& $this['application'];
+    $c =& $this[CONTAINER_APPLICATION];
     if (!$c instanceof Application) {
         return;
     }
