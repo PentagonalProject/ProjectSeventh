@@ -5,7 +5,11 @@ use Apatis\ArrayStorage\Collection;
 
 /**
  * Class Hook
- * @package Pentagonal\SlimHelper
+ * @package PentagonalProject\ProjectSeventh
+ *
+ * This source code base on WordPress hooks functionality
+ * code of WordPress convert to Current Object Hook
+ * But not all of features implemented here
  */
 class Hook
 {
@@ -219,7 +223,8 @@ class Hook
                 E_USER_ERROR
             );
         }
-        if ($this->filters->has($hookName)) {
+
+        if (!$this->filters->has($hookName)) {
             return $value;
         }
 
