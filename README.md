@@ -99,3 +99,6 @@ Pulang ke kandang kambing .. ihhhh
 Kalo tara coding standard, emangnyaa eike cowok apakaahhh ...
 
 ```
+
+
+Salam Es Teh
