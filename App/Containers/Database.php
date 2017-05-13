@@ -24,7 +24,7 @@ namespace {
         /**
          * @var Config $config
          */
-        $config =& $c['config'];
+        $config =& $c[CONTAINER_CONFIG];
         $databaseConfig = (array) $config->get('database', []);
 
         /* ---------------------------------------------------
