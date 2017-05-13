@@ -101,4 +101,6 @@ Kalo tara coding standard, emangnyaa eike cowok apakaahhh ...
 ```
 
 
-Salam Es Teh
+Salam Es Teh 
+
+`^ salam es teh diatas gak usah dianggep yang nulis rada sakit`
