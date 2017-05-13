@@ -20,7 +20,7 @@ namespace {
     return function (Container $container) : Session {
         $session = new Session();
         /** @var Config $config */
-        $config = $container['config'];
+        $config = $container[CONTAINER_CONFIG];
         $configSession = (array) $config->get('session', []);
         if (!empty($configSession)) {
             if (isset($configSession['save_path']) && $configSession['save_path']) {
