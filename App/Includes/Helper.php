@@ -20,43 +20,43 @@ function getWebServerSoftWare() : string
         ? $_SERVER['SERVER_SOFTWARE']
         : null;
 
-    $type = UNKNOWN_SERVER;
+    $type = SERVER_TYPE_UNKNOWN;
 
     if (stripos($software, 'lighttpd') !== false) {
-        $type = LIGHTTPD_SERVER;
+        $type = SERVER_TYPE_LIGHTTPD;
     }
 
     if (strpos($software, 'Hiawatha') !== false) {
-        $type = HIAWATHA_SERVER;
+        $type = SERVER_TYPE_HIAWATHA;
     }
 
     if (strpos($software, 'Apache') !== false) {
-        $type = APACHE_SERVER;
+        $type = SERVER_TYPE_APACHE;
     } elseif (strpos($software, 'Litespeed') !== false) {
-        $type = LITESPEED_SERVER;
+        $type = SERVER_TYPE_LITESPEED;
     }
 
     if (strpos($software, 'nginx') !== false) {
-        $type = NGINX_SERVER;
+        $type = SERVER_TYPE_NGINX;
     }
 
-    if ($type !== APACHE_SERVER && $type !== LITESPEED_SERVER
+    if ($type !== SERVER_TYPE_APACHE && $type !== SERVER_TYPE_LITESPEED
         && strpos($software, 'Microsoft-IIS') !== false
         && strpos($software, 'ExpressionDevServer') !== false
     ) {
-        $type = IIS_SERVER;
+        $type = SERVER_TYPE_IIS;
         if (intval(substr($software, strpos($software, 'Microsoft-IIS/')+14)) >= 7) {
-            $type =  IIS7_SERVER;
+            $type =  SERVER_TYPE_IIS7;
         }
     }
     if (function_exists('apache_get_modules')) {
         if (in_array('mod_security', apache_get_modules())) {
-            $type = APACHE_SERVER;
+            $type = SERVER_TYPE_APACHE;
         }
 
-        if ($type == UNKNOWN_SERVER && function_exists('apache_get_version')
+        if ($type == SERVER_TYPE_UNKNOWN && function_exists('apache_get_version')
         ) {
-            $type = APACHE_SERVER;
+            $type = SERVER_TYPE_APACHE;
         }
     }
 
@@ -70,7 +70,7 @@ function getWebServerSoftWare() : string
  */
 function isApache() : bool
 {
-    return in_array(getWebServerSoftWare(), [APACHE_SERVER, LITESPEED_SERVER]);
+    return in_array(getWebServerSoftWare(), [SERVER_TYPE_APACHE, SERVER_TYPE_LITESPEED]);
 }
 
 /**
@@ -80,7 +80,7 @@ function isApache() : bool
  */
 function isLiteSpeed(): bool
 {
-    return getWebServerSoftWare() === LIGHTTPD_SERVER;
+    return getWebServerSoftWare() === SERVER_TYPE_LIGHTTPD;
 }
 
 /**
@@ -90,7 +90,7 @@ function isLiteSpeed(): bool
  */
 function isNginx(): bool
 {
-    return getWebServerSoftWare() === NGINX_SERVER;
+    return getWebServerSoftWare() === SERVER_TYPE_NGINX;
 }
 
 /**
@@ -100,7 +100,7 @@ function isNginx(): bool
  */
 function isHiawatha(): bool
 {
-    return getWebServerSoftWare() === HIAWATHA_SERVER;
+    return getWebServerSoftWare() === SERVER_TYPE_HIAWATHA;
 }
 
 /**
@@ -110,7 +110,7 @@ function isHiawatha(): bool
  */
 function isLighttpd() : bool
 {
-    return getWebServerSoftWare() === LIGHTTPD_SERVER;
+    return getWebServerSoftWare() === SERVER_TYPE_LIGHTTPD;
 }
 
 /**
@@ -120,7 +120,7 @@ function isLighttpd() : bool
  */
 function isIIS() : bool
 {
-    return in_array(getWebServerSoftWare(), [IIS_SERVER, IIS7_SERVER]);
+    return in_array(getWebServerSoftWare(), [SERVER_TYPE_IIS, SERVER_TYPE_IIS7]);
 }
 
 /**
@@ -130,7 +130,7 @@ function isIIS() : bool
  */
 function isIIS7() : bool
 {
-    return getWebServerSoftWare() === IIS7_SERVER;
+    return getWebServerSoftWare() === SERVER_TYPE_IIS7;
 }
 
 /**
