@@ -21,7 +21,7 @@ namespace {
      */
     return function (Container $c) : EmbeddedCollection {
         /** @var Config $config */
-        $config = $c['config'];
+        $config = $c[CONTAINER_CONFIG];
         $extensionCollection = new EmbeddedCollection(
             $config->get('directory[extension]'),
             new ExtensionReader()
