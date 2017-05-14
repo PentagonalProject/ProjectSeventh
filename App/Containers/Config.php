@@ -12,6 +12,8 @@ namespace {
     use PentagonalProject\ProjectSeventh\Application;
     use PentagonalProject\ProjectSeventh\Arguments;
     use PentagonalProject\ProjectSeventh\Config;
+    use PentagonalProject\ProjectSeventh\Hook;
+    use phpFastCache\CacheManager;
     use Slim\Container;
 
     if (!isset($this) || ! $this instanceof Arguments) {
@@ -40,7 +42,41 @@ namespace {
             'module'    => $application->getRootDirectory('Modules'),
             'storage'   => $application->getRootDirectory('Storage'),
         ], $config['directory']);
+        if (!isset($config['cache']) || !is_array($config['cache'])) {
+            $config['cache'] = [
+                'driver' => 'Auto',
+                'config' => CacheManager::getDefaultConfig()
+            ];
+        }
+        if (!is_string($config['cache']['driver']) || trim($config['cache']['driver']) == '') {
+            $config['cache']['driver'] = 'Auto';
+        }
+        $config['cache']['driver'] = CacheManager::standardizeDriverName($config['cache']['driver']);
+        if (!in_array($config['cache']['driver'], CacheManager::getStaticAllDrivers())) {
+            $config['cache']['driver'] = 'Auto';
+        }
 
+        if (!is_array($config['cache']['config'])) {
+            $config['cache']['config'] = CacheManager::getDefaultConfig();
+        }
+        /**
+         * @var Hook $hook
+         */
+        $hook = $container[CONTAINER_HOOK];
+        $cacheDriver = $hook->apply(HOOK_HANDLER_CACHE_DRIVER, $config['cache']['driver']);
+        $cacheConfig = $hook->apply(HOOK_HANDLER_CACHE_CONFIG, $config['cache']['config']);
+        $cacheDriver = !is_string($cacheDriver)
+            ? 'Auto'
+            : CacheManager::standardizeDriverName($cacheDriver);
+        $cacheConfig = !is_array($cacheConfig)
+            ? CacheManager::getDefaultConfig()
+            : $cacheConfig;
+
+        if (!$cacheDriver || !in_array($cacheDriver, CacheManager::getStaticAllDrivers())) {
+            $cacheDriver = 'Auto';
+        }
+        $config['cache']['driver'] = $cacheDriver;
+        $config['cache']['config'] = $cacheConfig;
         return new Config($config);
     };
 }

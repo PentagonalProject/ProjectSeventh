@@ -15,6 +15,6 @@ namespace {
      */
     return [
         // input config
-        'displayErrorDetails' => true
+        'displayErrorDetails' => false,
     ];
 }
