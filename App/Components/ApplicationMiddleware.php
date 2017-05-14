@@ -10,6 +10,7 @@ namespace {
     use Apatis\Exceptions\RuntimeException;
     use PentagonalProject\ProjectSeventh\Application;
     use PentagonalProject\ProjectSeventh\Arguments;
+    use PentagonalProject\ProjectSeventh\Config;
     use PentagonalProject\ProjectSeventh\Hook;
     use Psr\Http\Message\ResponseInterface;
     use Psr\Http\Message\ServerRequestInterface;
@@ -39,11 +40,23 @@ namespace {
     $slim =& $c->getSlim();
 
     /**
-     * MiddleWare FIX Uri
+     * MiddleWare Fix Uri
+     *
      * That means Duplicate URI Indexing
      * /index.php/(REQUEST_URI) ==== /(REQUEST_URI)
+     * & Remark of ErrorDetails Setting
      */
     $slim->add(function (ServerRequestInterface $request, ResponseInterface $response, $next) {
+        /**
+         * Remark Display Error Details
+         *
+         * @var Config $config
+         */
+        $config = $this[CONTAINER_CONFIG];
+        $this[CONTAINER_SETTING]['displayErrorDetails'] = (bool) (
+            $config->get('environment[debug]', false) || $config->get('environment[error]', false)
+        );
+
         /**
          * @var Uri $uri
          */
@@ -75,12 +88,9 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $callableResolver = $hook->apply(
                     HOOK_HANDLER_CALLABLE_RESOLVER,
-                    function (Container $container) {
-                        return new CallableResolver($container);
-                    },
+                    new CallableResolver($this),
                     $this
                 );
-                $callableResolver = $callableResolver($this);
                 if (!$callableResolver instanceof CallableResolverInterface) {
                     throw new RuntimeException(
                         sprintf(
@@ -109,12 +119,9 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $callableResolver = $hook->apply(
                     HOOK_HANDLER_FOUND_RESPONSE,
-                    function () {
-                        return new RequestResponse;
-                    },
+                    new RequestResponse,
                     $this
                 );
-                $callableResolver = $callableResolver($this);
                 if (!$callableResolver instanceof InvocationStrategyInterface) {
                     throw new RuntimeException(
                         sprintf(
@@ -141,10 +148,11 @@ namespace {
                  * @var Hook $hook
                  */
                 $hook = $this[CONTAINER_HOOK];
-                $notFoundHandler = $hook->apply(HOOK_HANDLER_ERROR_404, function () {
-                    return new NotFound();
-                }, $this);
-                $notFoundHandler = $notFoundHandler($this);
+                $notFoundHandler = $hook->apply(
+                    HOOK_HANDLER_ERROR_404,
+                    new NotFound,
+                    $this
+                );
                 if (!$notFoundHandler instanceof AbstractHandler) {
                     throw new RuntimeException(
                         sprintf(
@@ -170,10 +178,11 @@ namespace {
              * @var Hook $hook
              */
             $hook = $this[CONTAINER_HOOK];
-            $notAllowedHandler = $hook->apply(HOOK_HANDLER_ERROR_403, function () {
-                return new NotAllowed();
-            }, $this);
-            $notAllowedHandler = $notAllowedHandler($this);
+            $notAllowedHandler = $hook->apply(
+                HOOK_HANDLER_ERROR_403,
+                new NotAllowed,
+                $this
+            );
             if (!$notAllowedHandler instanceof AbstractHandler) {
                 throw new RuntimeException(
                     sprintf(
@@ -200,12 +209,9 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $errorHandler = $hook->apply(
                     HOOK_HANDLER_ERROR_500,
-                    function (Container $container) {
-                        return new Error($container->get('settings')['displayErrorDetails']);
-                    },
+                    new Error($this->get('settings')['displayErrorDetails']),
                     $this
                 );
-                $errorHandler = $errorHandler($this);
                 if (!$errorHandler instanceof AbstractError) {
                     throw new RuntimeException(
                         sprintf(
@@ -234,12 +240,9 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $errorPhpHandler = $hook->apply(
                     HOOK_HANDLER_ERROR_PHP,
-                    function (Container $container) {
-                        return new PhpError($container->get('settings')['displayErrorDetails']);
-                    },
+                    new PhpError($this->get('settings')['displayErrorDetails']),
                     $this
                 );
-                $errorPhpHandler = $errorPhpHandler($this);
                 if (!$errorPhpHandler instanceof AbstractError) {
                     throw new RuntimeException(
                         sprintf(
