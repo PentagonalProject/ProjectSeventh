@@ -29,6 +29,24 @@ return [
         'error'   => true,
         'log'     => true,
     ],
+    'cache'      => [
+        // driver name
+        'driver' => 'auto',
+        /**
+         * @see \phpFastCache\CacheManager::getDefaultConfig()
+         */
+        'config' => [
+            'securityKey' => 'auto',
+            'ignoreSymfonyNotice' => false,
+            'defaultTtl' => 900,
+            'htaccess' => true,
+            'default_chmod' => 0777,
+            'path' => '',
+            'fallback' => false,
+            'limited_memory_each_object' => 4096,
+            'compress_data' => false,
+        ]
+    ],
     'session'  => [
         'name' => null,
         'save_path' => null,
