@@ -43,6 +43,13 @@ namespace {
              * Use on closure prevent being binding to
              * @return Config
              */
+            CONTAINER_CACHE => $c->includeScope($c->getContainerDirectory('Cache.php')),
+            /**
+             * Configuration Container
+             *
+             * Use on closure prevent being binding to
+             * @return Config
+             */
             CONTAINER_CONFIG => $c->includeScope($c->getContainerDirectory('Config.php'), $this[1]),
             /**
              * Closure
