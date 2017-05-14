@@ -42,6 +42,8 @@ define('CONTAINER_SETTINGS', CONTAINER_SETTING);
 
 define('CONTAINER_SESSION', 'session');
 define('CONTAINER_SESSIONS', CONTAINER_SESSION);
+// cache
+define('CONTAINER_CACHE', 'cache');
 
 define('CONTAINER_SLIM', 'slim');
 define('CONTAINER_REQUEST', 'request');
@@ -74,3 +76,5 @@ define('HOOK_HANDLER_ERROR_NOT_ALLOWED', HOOK_HANDLER_ERROR_403);
 define('HOOK_HANDLER_ERROR_PHP', HOOK_HANDLER_ERROR . ':Php');
 define('HOOK_HANDLER_CALLABLE_RESOLVER', 'Handler:Callable:Resolver');
 define('HOOK_HANDLER_FOUND_RESPONSE', 'Handler:Found:Response');
+define('HOOK_HANDLER_CACHE_DRIVER', 'Handler:Cache:Driver');
+define('HOOK_HANDLER_CACHE_CONFIG', 'Handler:Cache:Config');
