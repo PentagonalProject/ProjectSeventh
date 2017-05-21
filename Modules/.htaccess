@@ -1,1 +1,4 @@
+# Deny access from all
+# Modules never put any public access assets
+
 Deny From All
