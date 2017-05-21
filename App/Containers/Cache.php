@@ -34,9 +34,17 @@ namespace {
             }
         }
 
-        return CacheManager::getInstance(
+        $cache = CacheManager::getInstance(
             $config['cache[driver]'],
             $config['cache[config]']
         );
+
+        $container[CONTAINER_LOG]->debug(
+            'Cache initiated',
+            [
+                'Driver' => $config['cache[driver]']
+            ]
+        );
+        return $cache;
     };
 }

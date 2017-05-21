@@ -16,17 +16,23 @@ namespace {
     /**
      * Module Container
      *
-     * @var Container $c
+     * @var Container $container
      * @return EmbeddedCollection
      */
-    return function (Container $c) : EmbeddedCollection {
+    return function (Container $container) : EmbeddedCollection {
         /** @var Config $config */
-        $config = $c[CONTAINER_CONFIG];
+        $config = $container[CONTAINER_CONFIG];
         $moduleCollection = new EmbeddedCollection(
             $config->get('directory[module]'),
             new ModuleReader()
         );
         $moduleCollection->scan();
+        $container[CONTAINER_LOG]->debug(
+            'Extensions initiated & scan',
+            [
+                'Count' => $moduleCollection->count()
+            ]
+        );
         return $moduleCollection;
     };
 }

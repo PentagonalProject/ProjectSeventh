@@ -44,6 +44,7 @@ namespace {
             $session->getSession()->setCookieParams($cookieParams);
         }
 
+        $container[CONTAINER_LOG]->debug('Session initiated');
         return $session;
     };
 }

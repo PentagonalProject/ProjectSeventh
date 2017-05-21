@@ -17,14 +17,14 @@ namespace {
     /**
      * Database Container
      *
-     * @param Container $c
+     * @param Container $container
      * @return Database
      */
-    return function (Container $c): Database {
+    return function (Container $container): Database {
         /**
          * @var Config $config
          */
-        $config =& $c[CONTAINER_CONFIG];
+        $config =& $container[CONTAINER_CONFIG];
         $databaseConfig = (array) $config->get('database', []);
 
         /* ---------------------------------------------------
@@ -115,6 +115,13 @@ namespace {
         // set new Config
         $config->set('database', $databaseConfig);
         $database = new Database($databaseConfig);
+        $container[CONTAINER_LOG]->debug(
+            'Database initiated',
+            [
+                'Driver' => $databaseConfig['driver']
+            ]
+        );
+
         return $database;
     };
 }
