@@ -32,6 +32,12 @@ Contains Example modules, extensions script etc.
 
 See [Example](_example)
 
+## HOW TO DEVELOP & USE
+
+Installation and doing development, Please refer below
+
+See [INSTALL.md](INSTALL.md)
+
 
 ## VERSION
 See [VERSION](VERSION)
