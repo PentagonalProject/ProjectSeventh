@@ -13,6 +13,7 @@
         "aura/session": "^2.1",
         "doctrine/dbal": "^2.5",
         "guzzlehttp/guzzle": "~6",
+        "monolog/monolog": "~1",
         "phpfastcache/phpfastcache": "~5",
         "pentagonal/phpass": "^1",
         "pentagonal/simple_encrypt": "^1",
