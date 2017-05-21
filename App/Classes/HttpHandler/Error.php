@@ -23,7 +23,7 @@ class Error extends \Slim\Handlers\Error
      * @param bool $displayErrorDetails Set to true to display full details
      * @param Application $app
      */
-    public function __construct($displayErrorDetails = false, Application $app)
+    public function __construct($displayErrorDetails = false, Application $app = null)
     {
         $this->app = $app;
         parent::__construct($displayErrorDetails);
@@ -37,16 +37,18 @@ class Error extends \Slim\Handlers\Error
         ResponseInterface $response,
         \Exception $exception
     ) {
-        /** @var Logger $log */
-        $log = $this->app[CONTAINER_LOG];
-        $log->error(
-            $exception->getMessage(),
-            [
-                'file' => $exception->getFile(),
-                'code' => $exception->getCode(),
-                'line' => $exception->getLine()
-            ]
-        );
+        if ($this->app instanceof Application) {
+            /** @var Logger $log */
+            $log = $this->app[CONTAINER_LOG];
+            $log->error(
+                $exception->getMessage(),
+                [
+                    'file' => $exception->getFile(),
+                    'code' => $exception->getCode(),
+                    'line' => $exception->getLine()
+                ]
+            );
+        }
 
         return parent::__invoke($request, $response, $exception);
     }
