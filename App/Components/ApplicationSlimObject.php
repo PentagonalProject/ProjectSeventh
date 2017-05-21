@@ -20,12 +20,14 @@ namespace {
         return;
     }
 
-    /** @var Application $c */
-    $c =& $this[CONTAINER_APPLICATION];
-    if (!$c instanceof Application) {
+    /** @var Application $app */
+    $app =& $this[CONTAINER_APPLICATION];
+    if (!$app instanceof Application) {
         return;
     }
-
+    /**
+     * @return \Slim\App
+     */
     return new App(
         [
             /**
@@ -34,8 +36,8 @@ namespace {
              * Use on closure prevent being binding to
              * @return Application
              */
-            CONTAINER_APPLICATION => function () use (&$c) : Application {
-                return $c;
+            CONTAINER_APPLICATION => function () use (&$app) : Application {
+                return $app;
             },
             /**
              * Configuration Container
@@ -43,32 +45,32 @@ namespace {
              * Use on closure prevent being binding to
              * @return Config
              */
-            CONTAINER_CACHE => $c->includeScope($c->getContainerDirectory('Cache.php')),
+            CONTAINER_CACHE => $app->includeScope($app->getContainerDirectory('Cache.php')),
             /**
              * Configuration Container
              *
              * Use on closure prevent being binding to
              * @return Config
              */
-            CONTAINER_CONFIG => $c->includeScope($c->getContainerDirectory('Config.php'), $this[1]),
+            CONTAINER_CONFIG => $app->includeScope($app->getContainerDirectory('Config.php'), $this[1]),
             /**
              * Closure
              *
              * @return Database
              */
-            CONTAINER_DATABASE => $c->includeScope($c->getContainerDirectory('Database.php')),
+            CONTAINER_DATABASE => $app->includeScope($app->getContainerDirectory('Database.php')),
             /**
              * Closure
              *
              * @return Environment
              */
-            CONTAINER_ENVIRONMENT => $c->includeScope($c->getContainerDirectory('Environment.php')),
+            CONTAINER_ENVIRONMENT => $app->includeScope($app->getContainerDirectory('Environment.php')),
             /**
              * Closure
              *
              * @return Hook
              */
-            CONTAINER_HOOK => $c->includeScope($c->getContainerDirectory('Hook.php')),
+            CONTAINER_HOOK => $app->includeScope($app->getContainerDirectory('Hook.php')),
             /**
              * Module Container
              *
@@ -76,7 +78,7 @@ namespace {
              *
              * @return EmbeddedCollection
              */
-            CONTAINER_MODULE => $c->includeScope($c->getContainerDirectory('Module.php')),
+            CONTAINER_MODULE => $app->includeScope($app->getContainerDirectory('Module.php')),
             /**
              * Extension Container
              *
@@ -84,11 +86,11 @@ namespace {
              *
              * @return EmbeddedCollection
              */
-            CONTAINER_EXTENSION => $c->includeScope($c->getContainerDirectory('Extension.php')),
+            CONTAINER_EXTENSION => $app->includeScope($app->getContainerDirectory('Extension.php')),
             /**
              * @return array
              */
-            CONTAINER_SETTINGS => $c->includeScope($c->getContainerDirectory('Settings.php')),
+            CONTAINER_SETTINGS => $app->includeScope($app->getContainerDirectory('Settings.php')),
             /**
              * Session Container
              *
@@ -96,7 +98,7 @@ namespace {
              *
              * @return Session
              */
-            CONTAINER_SESSION => $c->includeScope($c->getContainerDirectory('Session.php')),
+            CONTAINER_SESSION => $app->includeScope($app->getContainerDirectory('Session.php')),
             /**
              * Slim Inheritance
              *
