@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 /* ------------------------------------------------------ *\
  |             APPLICATION COMPONENT MIDDLEWARE            |
 \* ------------------------------------------------------ */
@@ -12,6 +10,7 @@ namespace {
     use PentagonalProject\ProjectSeventh\Arguments;
     use PentagonalProject\ProjectSeventh\Config;
     use PentagonalProject\ProjectSeventh\Hook;
+    use PentagonalProject\ProjectSeventh\Utilities\EmbeddedCollection;
     use Psr\Http\Message\ResponseInterface;
     use Psr\Http\Message\ServerRequestInterface;
     use Slim\CallableResolver;
@@ -31,13 +30,13 @@ namespace {
         return;
     }
 
-    /** @var Application $c */
-    $c =& $this[CONTAINER_APPLICATION];
-    if (!$c instanceof Application) {
+    /** @var Application $app */
+    $app =& $this[CONTAINER_APPLICATION];
+    if (!$app instanceof Application) {
         return;
     }
 
-    $slim =& $c->getSlim();
+    $slim =& $app->getSlim();
 
     /**
      * MiddleWare Fix Uri
@@ -259,4 +258,54 @@ namespace {
 
         return $next($request, $response);
     });
+
+    /**
+     * Modules & Extension Loader Autoload from config
+     */
+    $slim->add(function (ServerRequestInterface $request, ResponseInterface $response, $next) {
+        /**
+         * @var Config $config
+         */
+        $config = $this[CONTAINER_CONFIG];
+        if (($modules = $config['autoload']['modules']) && is_array($modules)) {
+            /**
+             * @var EmbeddedCollection $moduleLoader
+             */
+            $moduleLoader = $this[CONTAINER_MODULE];
+            foreach ($modules as $module) {
+                if (is_string($module) & $moduleLoader->exist($module)) {
+                    $moduleLoader->load($module);
+                }
+            }
+        }
+        if (($extensions = $config['autoload']['extensions']) && is_array($extensions)) {
+            /**
+             * @var EmbeddedCollection $extensionLoader
+             */
+            $extensionLoader = $this[CONTAINER_MODULE];
+            foreach ($extensions as $extension) {
+                if (is_string($extension) & $extensionLoader->exist($extension)) {
+                    $extensionLoader->load($extension);
+                }
+            }
+        }
+
+        return $next($request, $response);
+    });
+
+    /**
+     * Includes Middleware auto load from config
+     */
+
+    /**
+     * @var Config $config
+     */
+    $config = $slim->getContainer()[CONTAINER_CONFIG];
+    if (($middleWares = $config['autoload']['middleware']) && is_array($middleWares)) {
+        foreach ($middleWares as $middleWare) {
+            if (is_string($middleWare) && file_exists($middleWare)) {
+                $app->includeScope($middleWare);
+            }
+        }
+    }
 }
