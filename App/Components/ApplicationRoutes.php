@@ -13,14 +13,22 @@ namespace {
         return;
     }
 
-    /** @var Application $c */
-    $c =& $this[CONTAINER_APPLICATION];
-    if (!$c instanceof Application) {
+    /** @var Application $app */
+    $app =& $this[CONTAINER_APPLICATION];
+    if (!$app instanceof Application) {
         return;
     }
 
     /**
      * @var App $slim
      */
-    // $slim =& $c->getSlim();
+     $slim =& $app->getSlim();
+     $config = $slim->getContainer()[CONTAINER_CONFIG];
+     if (($routes = $config['autoload']['routes'])&& is_array($routes)) {
+         foreach ($routes as $route) {
+             if (is_string($route) && file_exists($route)) {
+                 $app->includeScope($route);
+             }
+         }
+     }
 }
