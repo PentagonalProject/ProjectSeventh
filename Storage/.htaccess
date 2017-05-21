@@ -1,1 +1,4 @@
+# Deny access from all
+# That means log file never allow to be shown
+
 Deny From All
