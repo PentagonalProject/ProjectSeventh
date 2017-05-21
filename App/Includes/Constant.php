@@ -31,6 +31,9 @@ define('CONTAINER_ENVIRONMENTS', CONTAINER_ENVIRONMENT);
 define('CONTAINER_HOOK', 'hook');
 define('CONTAINER_HOOKS', CONTAINER_HOOK);
 
+define('CONTAINER_LOG', 'log');
+define('CONTAINER_LOGS', CONTAINER_LOG);
+
 define('CONTAINER_MODULE', 'module');
 define('CONTAINER_MODULES', CONTAINER_MODULE);
 
@@ -78,3 +81,8 @@ define('HOOK_HANDLER_CALLABLE_RESOLVER', 'Handler:Callable:Resolver');
 define('HOOK_HANDLER_FOUND_RESPONSE', 'Handler:Found:Response');
 define('HOOK_HANDLER_CACHE_DRIVER', 'Handler:Cache:Driver');
 define('HOOK_HANDLER_CACHE_CONFIG', 'Handler:Cache:Config');
+
+/* GLOBAL CONSTANT
+ * ----------------------------- */
+
+define('DEFAULT_LOG_NAME', 'logs.log');
