@@ -7,6 +7,7 @@ namespace {
 
     use PentagonalProject\ProjectSeventh\Application;
     use PentagonalProject\ProjectSeventh\Arguments;
+    use PentagonalProject\ProjectSeventh\Config;
     use Slim\App;
 
     if (!isset($this) || ! $this instanceof Arguments) {
@@ -20,15 +21,20 @@ namespace {
     }
 
     /**
-     * @var App $slim
+     * @var Config $config
      */
-     $slim =& $app->getSlim();
-     $config = $slim->getContainer()[CONTAINER_CONFIG];
-    if (($routes = $config['autoload']['routes'])&& is_array($routes)) {
+    $config = $app[CONTAINER_CONFIG];
+    if (($routes = $config['autoload[routes]'])&& is_array($routes)) {
+        $c = 0;
         foreach ($routes as $route) {
             if (is_string($route) && file_exists($route)) {
                 $app->includeScope($route);
+                $c++;
             }
         }
+        ($c > 0) &&
+            $app[CONTAINER_LOG]->debug('Additional Routes initiated', [
+                'Count' => $c
+            ]);
     }
 }
