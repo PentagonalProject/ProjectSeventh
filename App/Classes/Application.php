@@ -1,6 +1,7 @@
 <?php
 namespace PentagonalProject\ProjectSeventh;
 
+use Apatis\Exceptions\Error;
 use Apatis\Exceptions\InvalidArgumentException;
 use Apatis\Exceptions\LogicException;
 use PentagonalProject\ProjectSeventh\Exceptions\FileNotFoundException;
@@ -10,7 +11,7 @@ use Slim\App;
  * Class Application
  * @package PentagonalProject\ProjectSeventh
  */
-class Application
+class Application implements \ArrayAccess
 {
     /**
      * Application Key Name Selector
@@ -302,5 +303,86 @@ class Application
         $this->includeScope($this->getComponentDirectory('ApplicationRoutes.php'));
         $this->slim->run();
         return $this;
+    }
+
+    /**
+     * Get Application
+     *
+     * @param string $name
+     * @return mixed
+     * @throws Error
+     */
+    public function getContainer($name)
+    {
+        if (!$this->hasContainer($name)) {
+            settype($name, 'string');
+            throw new Error(
+                sprintf(
+                    "Application container %s is not exists!",
+                    $name
+                )
+            );
+        }
+
+        return $this->getSlim()->getContainer()->get($name);
+    }
+
+    /**
+     * if application exists
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasContainer($name)
+    {
+        if (!is_string($name)) {
+            return false;
+        }
+
+        $slim = $this->getSlim();
+        if ($slim instanceof App) {
+            $container = $slim->getContainer();
+            return $container->has($name);
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset)
+    {
+        return $this->hasContainer($offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset)
+    {
+        return $this->getContainer($offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value)
+    {
+        if ($this->getSlim() && $this->getSlim() instanceof App) {
+            $container = $this->getSlim()->getContainer();
+            $container[$offset] = $value;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset)
+    {
+        if ($this->getSlim() && $this->getSlim() instanceof App) {
+            $container = $this->getSlim()->getContainer();
+            unset($container[$offset]);
+        }
     }
 }
