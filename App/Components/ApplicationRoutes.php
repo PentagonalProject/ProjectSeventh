@@ -24,11 +24,11 @@ namespace {
      */
      $slim =& $app->getSlim();
      $config = $slim->getContainer()[CONTAINER_CONFIG];
-     if (($routes = $config['autoload']['routes'])&& is_array($routes)) {
-         foreach ($routes as $route) {
-             if (is_string($route) && file_exists($route)) {
-                 $app->includeScope($route);
-             }
-         }
-     }
+    if (($routes = $config['autoload']['routes'])&& is_array($routes)) {
+        foreach ($routes as $route) {
+            if (is_string($route) && file_exists($route)) {
+                $app->includeScope($route);
+            }
+        }
+    }
 }
