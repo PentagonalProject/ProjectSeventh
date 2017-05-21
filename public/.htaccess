@@ -3,7 +3,10 @@
 # ---------------------------------------------------------------
 
 # Don't Allow directory indexing
-Options Indexes FollowSymLinks Multiviews
+Options -Indexes
+
+# Follow The Symlinks
+Options FollowSymLinks Multiviews
 
 # ----------------------------------------------------------------
 # SECURITY ENGAGEMENT
