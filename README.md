@@ -30,7 +30,7 @@ See [Documentation](_docs)
 
 Contains Example modules, extensions script etc.
 
-See [Example](_example)
+See [Example](_docs/Example)
 
 ## HOW TO DEVELOP & USE
 
