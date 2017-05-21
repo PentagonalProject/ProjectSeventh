@@ -57,4 +57,20 @@ return [
         'httponly' => null,
         'secure'   => null,
     ],
+    // auto loading on separate loaded init
+    'autoload' => [
+        // load on inside middleware before another autoload middle ware loaded
+        'modules' => [
+        ],
+        // load on inside middleware before another autoload middle ware loaded
+        // after modules
+        'extensions' => [
+        ],
+        // load middle ware end of middle ware init
+        'middleware' => [
+        ],
+        // load on routes
+        'routes'  => [
+        ],
+    ],
 ];
