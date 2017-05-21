@@ -66,11 +66,20 @@ namespace {
              */
             CONTAINER_ENVIRONMENT => $app->includeScope($app->getContainerDirectory('Environment.php')),
             /**
+             * Extension Container
+             *
+             * Closure
+             *
+             * @return EmbeddedCollection
+             */
+            CONTAINER_EXTENSION => $app->includeScope($app->getContainerDirectory('Extension.php')),
+            /**
              * Closure
              *
              * @return Hook
              */
             CONTAINER_HOOK => $app->includeScope($app->getContainerDirectory('Hook.php')),
+            CONTAINER_LOG => $app->includeScope($app->getContainerDirectory('Log.php')),
             /**
              * Module Container
              *
@@ -79,14 +88,6 @@ namespace {
              * @return EmbeddedCollection
              */
             CONTAINER_MODULE => $app->includeScope($app->getContainerDirectory('Module.php')),
-            /**
-             * Extension Container
-             *
-             * Closure
-             *
-             * @return EmbeddedCollection
-             */
-            CONTAINER_EXTENSION => $app->includeScope($app->getContainerDirectory('Extension.php')),
             /**
              * @return array
              */
