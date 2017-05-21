@@ -28,6 +28,8 @@ return [
         'debug'   => true,
         'error'   => true,
         'log'     => true,
+        // logs.log if there / or \ will be convert to underscore
+        'log_name' => DEFAULT_LOG_NAME,
     ],
     'cache'      => [
         // driver name
