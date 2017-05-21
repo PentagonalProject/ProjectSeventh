@@ -8,7 +8,7 @@ Please refer [config.php](config.php) that contains configuration.
 - Php PDO extension (for database)
 - Php PCRE extension
 
-Suggests
+### Suggests
 
 - Php cURL Extension (for guzzle)
 - Php openssl Extension (for encryption)
