@@ -5,6 +5,8 @@
     "version": "0.1.0-alphaDev",
     "require": {
         "php": ">= 7",
+        "ext-PDO": ">= 7",
+        "ext-pcre": ">= 7",
         "apatis/array-storage": "^1",
         "apatis/exceptions": "^1",
         "apatis/transporter": "dev-master",
@@ -20,6 +22,13 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "2.*",
         "phpunit/phpunit": "^5"
+    },
+    "suggest": {
+        "ext-curl": "To allow using Guzzle HTTP.",
+        "ext-openssl": "For better Encryption process on pentagonal/simple_encrypt",
+        "ext-mbstring": "For compatibility any package.",
+        "ext-mcrypt": "For compatibility any package.",
+        "ext-iconv": "For better sanitation characters & text output."
     },
     "license": "BSD",
     "authors": [
