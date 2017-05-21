@@ -10,6 +10,8 @@ namespace {
     use PentagonalProject\ProjectSeventh\Arguments;
     use PentagonalProject\ProjectSeventh\Config;
     use PentagonalProject\ProjectSeventh\Hook;
+    use PentagonalProject\ProjectSeventh\HttpHandler\PhpError;
+    use PentagonalProject\ProjectSeventh\HttpHandler\Error;
     use PentagonalProject\ProjectSeventh\Utilities\EmbeddedCollection;
     use Psr\Http\Message\ResponseInterface;
     use Psr\Http\Message\ServerRequestInterface;
@@ -19,8 +21,6 @@ namespace {
     use Slim\Handlers\AbstractHandler;
     use Slim\Handlers\NotAllowed;
     use Slim\Handlers\NotFound;
-    use Slim\Handlers\Error;
-    use Slim\Handlers\PhpError;
     use Slim\Handlers\Strategies\RequestResponse;
     use Slim\Http\Uri;
     use Slim\Interfaces\CallableResolverInterface;
@@ -208,7 +208,10 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $errorHandler = $hook->apply(
                     HOOK_HANDLER_ERROR_500,
-                    new Error($this->get('settings')['displayErrorDetails']),
+                    new Error(
+                        $this->get('settings')['displayErrorDetails'],
+                        $this[CONTAINER_APPLICATION]
+                    ),
                     $this
                 );
                 if (!$errorHandler instanceof AbstractError) {
@@ -239,7 +242,10 @@ namespace {
                 $hook = $this[CONTAINER_HOOK];
                 $errorPhpHandler = $hook->apply(
                     HOOK_HANDLER_ERROR_PHP,
-                    new PhpError($this->get('settings')['displayErrorDetails']),
+                    new PhpError(
+                        $this->get('settings')['displayErrorDetails'],
+                        $this[CONTAINER_APPLICATION]
+                    ),
                     $this
                 );
                 if (!$errorPhpHandler instanceof AbstractError) {
@@ -267,7 +273,7 @@ namespace {
          * @var Config $config
          */
         $config = $this[CONTAINER_CONFIG];
-        if (($modules = $config['autoload']['modules']) && is_array($modules)) {
+        if (($modules = $config['autoload[modules]']) && is_array($modules)) {
             /**
              * @var EmbeddedCollection $moduleLoader
              */
@@ -300,12 +306,19 @@ namespace {
     /**
      * @var Config $config
      */
-    $config = $slim->getContainer()[CONTAINER_CONFIG];
-    if (($middleWares = $config['autoload']['middleware']) && is_array($middleWares)) {
+    $config = $app[CONTAINER_CONFIG];
+    if (($middleWares = $config['autoload[middleware]']) && is_array($middleWares)) {
+        $c = 0;
         foreach ($middleWares as $middleWare) {
             if (is_string($middleWare) && file_exists($middleWare)) {
                 $app->includeScope($middleWare);
+                $c++;
             }
         }
+
+        ($c > 0) &&
+            $app[CONTAINER_LOG]->debug('Additional Middleware initiated', [
+                'Count' => $c
+            ]);
     }
 }
