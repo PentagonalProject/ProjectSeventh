@@ -110,4 +110,4 @@ require __DIR__ . '/../vendor/autoload.php';
 // try to includes once
 require_once __DIR__ .'/../App/FunctionsIncludes.php';
 return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require __DIR__. '/../config.php');
+    ->process((array) require __DIR__ . '/../Config/Config.php');
