@@ -173,5 +173,8 @@ vendor
 # Ignore Visual Studio code
 .vscode
 
+# ON LOCAL DEV
 /Modules/*/
-/Storage/logs/*.*
+/Extensions/*/
+/Config/Config.php
+
