@@ -15,6 +15,7 @@
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <!-- Path To Check -->
     <file>App</file>
+    <file>Config</file>
     <file>Modules</file>
     <file>Extensions</file>
     <file>public</file>
