@@ -263,6 +263,10 @@ abstract class ResponseGeneratorAbstract
             : strtolower(trim($this->mimeType));
 
         if ($this->recheckMimeType || strpos($this->mimeType, '/') === false) {
+            $selectedContentTypes = array_filter(explode(',', $this->mimeType));
+            if (count($selectedContentTypes)) {
+                $this->mimeType = current($selectedContentTypes);
+            }
             if (preg_match(
                 '/(?:(?:[^/]*)(?:\\\+|\/+))?(html?|javascript|calendar|css|plain)/',
                 $this->mimeType,
