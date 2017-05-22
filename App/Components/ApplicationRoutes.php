@@ -8,7 +8,6 @@ namespace {
     use PentagonalProject\ProjectSeventh\Application;
     use PentagonalProject\ProjectSeventh\Arguments;
     use PentagonalProject\ProjectSeventh\Config;
-    use Slim\App;
 
     if (!isset($this) || ! $this instanceof Arguments) {
         return;
