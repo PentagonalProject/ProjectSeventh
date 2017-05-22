@@ -1,6 +1,6 @@
 # INSTALLATION
 
-Please refer [config.php](config.php) that contains configuration.
+Please refer [Config/Example.Config.php](Config/Example.Config.php) that contains configuration.
 
 ### Requirements
 
@@ -31,17 +31,17 @@ And open `index.php` and then change.
 
 ```
 return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require __DIR__. '/../config.php');
+    ->process((array) require __DIR__. '/../Config/Config.php');
 ```
 
 with
 
 ```
 return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require '/path/to/your/config.php');
+    ->process((array) require '/path/to/your/Config.php');
 ```
 
-Just change require file of `config.php`, and `config.php` must be as contains array return.
+Just change require Configuration file of `Example.Config.php`, and `Configuration File` must be as contains array return.
 
 ### Library Install
 
@@ -49,4 +49,10 @@ Use composer to install, go to script directory and run:
 
 ```bash
 composer install --no-dev --optimize-autoloader
+```
+
+If there was additional file on core directory, please update composer autoload
+
+```bash
+composer dump-autoload --optimize-autoloader
 ```
