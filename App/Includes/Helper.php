@@ -219,7 +219,7 @@ function getDefaultLogNameByCode($code, string $default = 'logs.log') : string
             return 'emergency.log';
         case \Monolog\Logger::CRITICAL:
             return 'critical.log';
-        case \Monolog\Logger::ALERT;
+        case \Monolog\Logger::ALERT:
             return 'alert.log';
     }
 
