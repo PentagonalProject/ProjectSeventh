@@ -1,6 +1,6 @@
 # PENTAGONAL PROJECT
 
-[![Build Status](https://travis-ci.org/PentagonalProject/ProjectSeventh.svg?branch=development)](https://travis-ci.org/PentagonalProject/ProjectSeventh)
+[![Build Status](https://api.travis-ci.org/PentagonalProject/ProjectSeventh.svg?branch=development)](https://travis-ci.org/PentagonalProject/ProjectSeventh)
 
 
 --- 
