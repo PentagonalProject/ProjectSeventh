@@ -26,13 +26,15 @@ namespace {
             $type = is_int($config['environment[log]'])
                 ? $config['environment[log]']
                 : ($config['environment[debug]']
-                    ? Logger::DEBUG
+                    ? LOG_MODE_DEFAULT
                     : Logger::WARNING
                 );
+
             $logName = $config['environment[log_name]'];
-            if (!is_string($logName)) {
-                $logName = 'log.log';
+            if (!$logName || !is_string($logName) || trim($logName) == '') {
+                $logName = getDefaultLogNameByCode($type, 'logs.log');
             }
+
             $logName = str_replace(
                 [
                     '/',
@@ -41,7 +43,9 @@ namespace {
                 '_',
                 $logName
             );
+
             $config['environment[log_name]'] = $logName;
+
             /**
              * @var Application $app
              */

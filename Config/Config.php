@@ -25,11 +25,16 @@ return [
         'collate'  => 'utf8_unicode_ci',
     ],
     'environment' => [
+        // beware debug log will be make your disk full, use this for dev only
         'debug'   => true,
+        // set Notice for log
+        'log'     => LOG_MODE_NOTICE,
+        // show error verbose
         'error'   => true,
-        'log'     => true,
         // logs.log if there / or \ will be convert to underscore
-        'log_name' => DEFAULT_LOG_NAME,
+        // log placed under directory[storage]/logs (Default 'Storage/logs')
+        // and set null or empty value to make log automatically set by log level
+        'log_name' => null,
     ],
     'cache'      => [
         // driver name

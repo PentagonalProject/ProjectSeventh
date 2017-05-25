@@ -107,7 +107,7 @@ EOF;
 // Require Composer Autoload
 require __DIR__ . '/../vendor/autoload.php';
 // if the composer that must not ../App/FunctionIncludes.php
-// try to includes once
+// try to includes once (beware FunctionsIncludes.php must be load after vendor loaded)
 require_once __DIR__ .'/../App/FunctionsIncludes.php';
 return (new PentagonalProject\ProjectSeventh\Application())
     ->process((array) require __DIR__ . '/../Config/Config.php');

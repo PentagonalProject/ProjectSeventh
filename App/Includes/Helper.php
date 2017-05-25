@@ -158,3 +158,70 @@ function isMobile() : bool
 
     return false;
 }
+
+/**
+ * Get Alias Log Level
+ *
+ * @param int $code
+ * @return int if no match between code will be return int 0
+ */
+function getAliasLogLevel(int $code) : int
+{
+    switch ($code) {
+        case E_NOTICE:
+        case E_USER_NOTICE:
+        case E_DEPRECATED:
+        case E_USER_DEPRECATED:
+            return \Monolog\Logger::NOTICE;
+        case E_ERROR:
+        case E_CORE_ERROR:
+        case E_COMPILE_ERROR:
+            return \Monolog\Logger::ERROR;
+        case E_WARNING:
+        case E_USER_WARNING:
+        case E_COMPILE_WARNING:
+            return \Monolog\Logger::WARNING;
+        case E_ALL:
+            return \Monolog\Logger::DEBUG;
+    }
+
+    return 0;
+}
+
+/**
+ * Get Default Log Name By Code
+ *
+ * @param int $code
+ * @param string $default
+ * @return string
+ */
+function getDefaultLogNameByCode($code, string $default = 'logs.log') : string
+{
+    $code = is_numeric($code) && !is_float($code)
+        ? abs($code)
+        : $code;
+    if (!is_int($code)) {
+        return $default;
+    }
+
+    switch (getAliasLogLevel($code)) {
+        case \Monolog\Logger::NOTICE:
+            return 'notice.log';
+        case \Monolog\Logger::ERROR:
+            return 'error.log';
+        case \Monolog\Logger::WARNING:
+            return 'warning.log';
+        case \Monolog\Logger::INFO:
+            return 'info.log';
+        case \Monolog\Logger::DEBUG:
+            return 'debug.log';
+        case \Monolog\Logger::EMERGENCY:
+            return 'emergency.log';
+        case \Monolog\Logger::CRITICAL:
+            return 'critical.log';
+        case \Monolog\Logger::ALERT;
+            return 'alert.log';
+    }
+
+    return $default;
+}

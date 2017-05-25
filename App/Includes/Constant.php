@@ -82,7 +82,21 @@ define('HOOK_HANDLER_FOUND_RESPONSE', 'Handler:Found:Response');
 define('HOOK_HANDLER_CACHE_DRIVER', 'Handler:Cache:Driver');
 define('HOOK_HANDLER_CACHE_CONFIG', 'Handler:Cache:Config');
 
-/* GLOBAL CONSTANT
+/* GLOBAL CONSTANT LOG MODE
  * ----------------------------- */
 
-define('DEFAULT_LOG_NAME', 'logs.log');
+/**
+ * @see \Monolog\Logger
+ */
+define('LOG_MODE_ALERT', \Monolog\Logger::ALERT);         // int 550
+define('LOG_MODE_CRITICAL', \Monolog\Logger::CRITICAL);   // int 500
+define('LOG_MODE_DEBUG', \Monolog\Logger::DEBUG);         // int 100
+define('LOG_MODE_EMERGENCY', \Monolog\Logger::EMERGENCY); // int 600
+define('LOG_MODE_ERROR', \Monolog\Logger::ERROR);         // int 400
+define('LOG_MODE_INFO', \Monolog\Logger::INFO);           // int 200
+define('LOG_MODE_NOTICE', \Monolog\Logger::NOTICE);       // int 250
+define('LOG_MODE_WARNING', \Monolog\Logger::WARNING);     // int 300
+define('LOG_MODE_DEFAULT', \Monolog\Logger::NOTICE);      // int 250
+
+/* GLOBAL CONSTANT
+ * ----------------------------- */
