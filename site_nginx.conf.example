@@ -3,18 +3,28 @@ server {
     # port
     listen 80;
 
-    # host
-    server_name domain.cug;
+    # If use SSL & Want To use Multi Port Listen
 
-    # indexing
-    index index.php;
+    # listen 443 ssl;
+    # ssl on;
+    # certificate must be contain bundle to allow browser validate
+    # ssl_certificate       /path/to/certificate.crt
+    # ssl_certificate_key   /path/to/certificate.key
+    # ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
+    # ssl_ciphers           HIGH:!aNULL:!MD5;
+
+    # host
+    server_name domain.cug www.domain.cug;
+
+    # indexing - order index.php first and then index.html & index.htm
+    index index.php index.html index.htm;
 
     # root path for public
     root /path/to/public;
 
     # Disable Logging for error
-    access_log  /dev/null;
-    error_log /dev/null;
+    # access_log  /dev/null;
+    # error_log /dev/null;
 
     # Query File Indexing
     location / {
@@ -24,6 +34,10 @@ server {
     # NGinX Worker
     location ~ \.php {
         try_files $uri = 404;
+
+        # try below to handle all 404 not found with script
+        # try_files $uri /index.php$is_args$args;
+
         # Fast CGI
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         include fastcgi_params;
@@ -32,6 +46,7 @@ server {
         fastcgi_index index.php;
 
         # listen for cgi param port
+        # port for cgi params has followed of fast cgi config
         fastcgi_pass 127.0.0.1:9000;
     }
 }
