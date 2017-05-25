@@ -43,7 +43,7 @@ abstract class ResponseGeneratorAbstract
     /**
      * @var int
      */
-    protected $statusCode;
+    protected $statusCode = 200;
 
     /**
      * @var int
