@@ -19,3 +19,43 @@
 	    Require all granted
     </Directory>
 </VirtualHost>
+
+# SSL Config
+# Check If SSL Module Loaded (optional)
+<IfModule mod_ssl.c>
+    # 443 is common https port
+    <VirtualHost 127.0.0.1:443>
+        # Domain Name / Server
+        ServerName domain.cug
+
+        # Server Aliasing
+        ServerAlias domain.cug www.domain.cug
+
+        # Document Index Root Public / Symlink to path
+        DocumentRoot /path/to/public
+
+        # Email For Server Admin
+        ServerAdmin admin@domain.cug
+
+        # enable SSL Engine
+        SSLEngine on
+
+        # disable verify client
+        SSLVerifyClient      none
+
+        # ca / root chain certificate if not use self signed
+        SSLCACertificateFile    /path/to/ca.crt
+        SSLCertificateFile      /path/to/certificate.crt
+        SSLCertificateKeyFile   /path/to/certificate.key
+
+        # requires strong ciphers
+        SSLCipherSuite HIGH:!aNULL:!MD5
+
+        # Grant Of Directory
+        <Directory /path/to/public>
+            Options Indexes FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>
+    </VirtualHost>
+</IfModule>
