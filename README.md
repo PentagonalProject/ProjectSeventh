@@ -1,4 +1,4 @@
-# PENTAGONAL PROJECT
+## KIM CHILL - KEY POLAND - KART CHEER AND
 
 [![Build Status](https://api.travis-ci.org/PentagonalProject/ProjectSeventh.svg?branch=development)](https://travis-ci.org/PentagonalProject/ProjectSeventh)
 
