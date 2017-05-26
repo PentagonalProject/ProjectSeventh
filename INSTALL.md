@@ -64,6 +64,8 @@ return (new PentagonalProject\ProjectSeventh\Application())
             'driver'   => 'mysql',
             'charset'  => 'utf8',
             'collate'  => 'utf8_unicode_ci',
+            // database prefix
+            'prefix'   => 'db_',
         ],
         'environment' => [
             'debug'   => false,
