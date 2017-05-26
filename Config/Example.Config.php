@@ -23,6 +23,8 @@ return [
         'driver'   => 'mysql',
         'charset'  => 'utf8',
         'collate'  => 'utf8_unicode_ci',
+        // database prefix
+        'prefix'   => 'db_',
     ],
     'environment' => [
         // beware debug log will be make your disk full, use this for dev only
