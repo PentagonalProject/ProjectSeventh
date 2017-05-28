@@ -15,6 +15,7 @@ namespace {
     use PentagonalProject\ProjectSeventh\Hook;
     use phpFastCache\CacheManager;
     use Slim\Container;
+    use Slim\Http\Response;
 
     if (!isset($this) || ! $this instanceof Arguments) {
         return;
@@ -35,6 +36,20 @@ namespace {
         : '1.1';
 
     return function (Container $container) use (&$config) : Config {
+        // override Server Protocol
+        $container['settings']['httpVersion'] = $config['httpVersion'];
+        /** @var Response $response */
+        $response = clone $container[CONTAINER_RESPONSE];
+        if ($response->getProtocolVersion() != $config['httpVersion']) {
+            unset($container[CONTAINER_RESPONSE]);
+            try {
+                $newResponse = $response->withProtocolVersion($config['httpVersion']);
+                $container[CONTAINER_RESPONSE] = $newResponse;
+            } catch (\Exception $exception) {
+                $container[CONTAINER_RESPONSE] = $response;
+            }
+        }
+
         /** @var Application $application */
         $application = $container[CONTAINER_APPLICATION];
         $config['directory'] = array_merge([
