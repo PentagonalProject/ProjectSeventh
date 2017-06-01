@@ -14,7 +14,11 @@ namespace {
     use PentagonalProject\ProjectSeventh\Utilities\EmbeddedCollection;
     use Slim\App;
     use Slim\Container;
+    use Slim\Handlers\AbstractError;
+    use Slim\Handlers\AbstractHandler;
     use Slim\Http\Environment;
+    use Slim\Interfaces\CallableResolverInterface;
+    use Slim\Interfaces\InvocationStrategyInterface;
 
     if (!isset($this) || ! $this instanceof Arguments) {
         return;
@@ -25,6 +29,7 @@ namespace {
     if (!$app instanceof Application) {
         return;
     }
+
     /**
      * @return \Slim\App
      */
@@ -111,7 +116,43 @@ namespace {
                  */
                 $application =& $container[CONTAINER_APPLICATION];
                 return $application->getSlim();
-            }
+            },
+            /**
+             * Callable Resolver
+             *
+             * @return CallableResolverInterface
+             */
+            CONTAINER_CALLABLE_RESOLVER => $app->includeScope($app->getContainerDirectory('CallableResolver.php')),
+            /**
+             * Found Handler
+             *
+             * @return InvocationStrategyInterface
+             */
+            CONTAINER_FOUND_HANDLER => $app->includeScope($app->getContainerDirectory('FoundHandler.php')),
+            /**
+             * Not Found Handler
+             *
+             * @return AbstractHandler
+             */
+            CONTAINER_NOT_FOUND_HANDLER => $app->includeScope($app->getContainerDirectory('NotFoundHandler.php')),
+            /**
+             * Not Allowed Handler
+             *
+             * @return AbstractHandler
+             */
+            CONTAINER_NOT_ALLOWED_HANDLER => $app->includeScope($app->getContainerDirectory('NotAllowedHandler.php')),
+            /**
+             * Error Handler
+             *
+             * @return AbstractError
+             */
+            CONTAINER_ERROR_HANDLER => $app->includeScope($app->getContainerDirectory('ErrorHandler.php')),
+            /**
+             * Php Error Handler
+             *
+             * @return AbstractError
+             */
+            CONTAINER_PHP_ERROR_HANDLER => $app->includeScope($app->getContainerDirectory('PhpErrorHandler.php')),
         ]
     );
 }
