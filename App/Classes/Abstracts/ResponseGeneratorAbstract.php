@@ -59,6 +59,7 @@ abstract class ResponseGeneratorAbstract
     {
         $this->setRequest($request);
         $this->setResponse($response);
+        $this->setStatusCode($response->getStatusCode());
     }
 
     /**

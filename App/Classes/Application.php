@@ -5,6 +5,7 @@ use Apatis\Exceptions\Error;
 use Apatis\Exceptions\InvalidArgumentException;
 use Apatis\Exceptions\LogicException;
 use PentagonalProject\ProjectSeventh\Exceptions\FileNotFoundException;
+use Psr\Http\Message\ResponseInterface;
 use Slim\App;
 
 /**
@@ -281,9 +282,9 @@ class Application implements \ArrayAccess
      * Run The application
      *
      * @param array $config
-     * @return Application
+     * @return ResponseInterface
      */
-    public function process(array $config)
+    public function process(array $config) : ResponseInterface
     {
         if ($this->hasRun) {
             throw new LogicException(
@@ -301,8 +302,8 @@ class Application implements \ArrayAccess
         $this->includeScope($this->getComponentDirectory('ApplicationMiddleware.php'));
         // determine & call routes
         $this->includeScope($this->getComponentDirectory('ApplicationRoutes.php'));
-        $this->slim->run();
-        return $this;
+
+        return $this->slim->run(true);
     }
 
     /**
