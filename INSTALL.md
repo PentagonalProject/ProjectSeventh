@@ -29,18 +29,35 @@ If you want to change structure of `index.php` to your another place / current s
 just move the `index.php` & `.htaccess` file.
 And open `index.php` and then change.
 
-```
-return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require __DIR__. '/../Config/Config.php');
+```php
+<?php
+/**
+ * @var \PentagonalProject\ProjectSeventh\Application $app 
+ */
+$app = new PentagonalProject\ProjectSeventh\Application();
+/**
+ * @var \Psr\Http\Message\ResponseInterface $response 
+ */
+$response = $app->process((array) require __DIR__. '/../Config/Config.php');
+$app->getSlim()->respond($response);
 ```
 
 ##
 
 with
 
-```
-return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require '/path/to/your/Config.php');
+```php
+<?php
+/**
+ * @var \PentagonalProject\ProjectSeventh\Application $app 
+ */
+$app = new PentagonalProject\ProjectSeventh\Application();
+/**
+ * @var \Psr\Http\Message\ResponseInterface $response 
+ */
+$app = new PentagonalProject\ProjectSeventh\Application();
+$response = $app->process((array) require '/path/to/your/Config.php');
+$app->getSlim()->respond($response);
 ```
 
 Just change require Configuration file of `Example.Config.php`, and `Configuration File` must be as contains array return.
@@ -50,65 +67,73 @@ Just change require Configuration file of `Example.Config.php`, and `Configurati
 
 Or you can fill config inside index.php on process
 
-```
-return (new PentagonalProject\ProjectSeventh\Application())
-    ->process([
-        'directory' => [
-        ],
-        'database' => [
-            'host'     => 'db_host',
-            'user'     => 'db_user',
-            'password' => 'db_pass',
-            'name'     => 'db_name',
-            'port'     => 3306,
-            'driver'   => 'mysql',
-            'charset'  => 'utf8',
-            'collate'  => 'utf8_unicode_ci',
-            // database prefix
-            'prefix'   => 'db_',
-        ],
-        'environment' => [
-            'debug'   => false,
-            'log'     => LOG_MODE_NOTICE,
-            'error'   => true,
-            'log_name' => null,
-        ],
-        'cache'      => [
-            'driver' => 'driverName',
-            /**
-             * @see \phpFastCache\CacheManager::getDefaultConfig()
-             */
-            'config' => [
-                'securityKey' => 'auto',
-                'ignoreSymfonyNotice' => false,
-                'defaultTtl' => 900,
-                'htaccess' => true,
-                'default_chmod' => 0777,
-                'path' => '',
-                'fallback' => false,
-                'limited_memory_each_object' => 4096,
-                'compress_data' => false,
-            ]
-        ],
-        'session'  => [
-            'name' => null,
-            'save_path' => null,
-            // values of cookie params
-            'path' => '/',
-            'lifetime' => 0,
-            'domain'   => null,
-            'httponly' => null,
-            'secure'   => null,
-        ],
-        // auto loading on separate loaded init
-        'autoload' => [
-            'middleware' => [],
-            'routes'  => [
-                // example Route
-                '/Path/To/RouteFile.php'
-            ],
+```php
+<?php
+/**
+ * @var \PentagonalProject\ProjectSeventh\Application $app 
+ */
+$app = new PentagonalProject\ProjectSeventh\Application();
+/**
+ * @var \Psr\Http\Message\ResponseInterface $response 
+ */
+$response = $app->process([
+    'directory' => [
+    ],
+    'database' => [
+        'host'     => 'db_host',
+        'user'     => 'db_user',
+        'password' => 'db_pass',
+        'name'     => 'db_name',
+        'port'     => 3306,
+        'driver'   => 'mysql',
+        'charset'  => 'utf8',
+        'collate'  => 'utf8_unicode_ci',
+        // database prefix
+        'prefix'   => 'db_',
+    ],
+    'environment' => [
+        'debug'   => false,
+        'log'     => LOG_MODE_NOTICE,
+        'error'   => true,
+        'log_name' => null,
+    ],
+    'cache'      => [
+        'driver' => 'driverName',
+        /**
+         * @see \phpFastCache\CacheManager::getDefaultConfig()
+         */
+        'config' => [
+            'securityKey' => 'auto',
+            'ignoreSymfonyNotice' => false,
+            'defaultTtl' => 900,
+            'htaccess' => true,
+            'default_chmod' => 0777,
+            'path' => '',
+            'fallback' => false,
+            'limited_memory_each_object' => 4096,
+            'compress_data' => false,
         ]
-    ]);
+    ],
+    'session'  => [
+        'name' => null,
+        'save_path' => null,
+        // values of cookie params
+        'path' => '/',
+        'lifetime' => 0,
+        'domain'   => null,
+        'httponly' => null,
+        'secure'   => null,
+    ],
+    // auto loading on separate loaded init
+    'autoload' => [
+        'middleware' => [],
+        'routes'  => [
+            // example Route
+            '/Path/To/RouteFile.php'
+        ],
+    ]
+]);
+$app->getSlim()->respond($response);
 ```
 
 
