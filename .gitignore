@@ -178,4 +178,4 @@ vendor
 /Extensions/*/
 /Config/Config.php
 /Config/Routes
-
+/Private
