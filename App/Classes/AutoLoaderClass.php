@@ -39,6 +39,11 @@ final class AutoLoaderClass
     protected $baseDirectory = [];
 
     /**
+     * @var array
+     */
+    protected $missedClass = [];
+
+    /**
      * AutoLoaderClass constructor.
      * @param string       $nameSpace
      * @param string|array $directory
@@ -139,6 +144,7 @@ final class AutoLoaderClass
         if (!is_string($class)) {
             return false;
         }
+
         if ($file = $this->findFileFor($class)) {
             // prevent multiple call of class
             if (class_exists($class)) {
@@ -148,6 +154,12 @@ final class AutoLoaderClass
             IncludeFileOnce($file);
             return true;
         }
+
+        $class = ltrim($class, '\\');
+        // counting missed
+        $this->missedClass[$class] = isset($this->missedClass[$class])
+            ? $this->missedClass[$class]++
+            : 1;
 
         return false;
     }
