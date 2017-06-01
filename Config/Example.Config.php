@@ -40,7 +40,7 @@ return [
     ],
     'cache'      => [
         // driver name
-        'driver' => 'redis',
+        'driver' => 'auto',
         /**
          * @see \phpFastCache\CacheManager::getDefaultConfig()
          */
