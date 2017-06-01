@@ -28,10 +28,19 @@ class Json extends ResponseGeneratorAbstract
     {
         /** @var Response $response */
         $response = $this->getResponse();
-        return $response->withJson(
+        $response = $response->withJson(
             $this->getData(),
             $this->getStatusCode(),
             $this->getEncoding()
         );
+
+        if ($response->hasHeader('Content-Length')) {
+            $response = $response->withHeader(
+                'Content-Length',
+                $response->getBody()->getSize()
+            );
+        }
+
+        return $response;
     }
 }

@@ -5,6 +5,8 @@ use PentagonalProject\ProjectSeventh\Abstracts\ResponseGeneratorAbstract;
 use PentagonalProject\ProjectSeventh\Utilities\XmlBuilderTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Body;
+use Slim\Http\Response;
 
 /**
  * Class Xml
@@ -31,14 +33,23 @@ class Xml extends ResponseGeneratorAbstract
      */
     public function serve(): ResponseInterface
     {
-        $body = $this->getResponse()->getBody();
-        $body->write($this->generateXML($this->getCharset(), (array) $this->getData()));
+        $body = new Body(fopen('php://temp', 'r+'));
+        $body->write(
+            $this->generateXML($this->getCharset(), (array) $this->getData())
+        );
         $response = $this
             ->getResponse()
             ->withBody($body)
             ->withHeader('Content-Type', $this->getContentType());
         if ($this->getStatusCode()) {
             $response = $response->withStatus($this->getStatusCode());
+        }
+        /** @var Response $response */
+        if ($response->hasHeader('Content-Length')) {
+            $response = $response->withHeader(
+                'Content-Length',
+                $response->getBody()->getSize()
+            );
         }
 
         return $response;

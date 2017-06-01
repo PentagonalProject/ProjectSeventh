@@ -4,6 +4,7 @@ namespace PentagonalProject\ProjectSeventh\ResponseGenerator;
 use PentagonalProject\ProjectSeventh\Abstracts\ResponseGeneratorAbstract;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Body;
 
 /**
  * Class Html
@@ -25,15 +26,24 @@ class Html extends ResponseGeneratorAbstract
      */
     public function serve(): ResponseInterface
     {
-        $body = $this->getResponse()->getBody();
+        $body = new Body(fopen('php://temp', 'r+'));
         $data = $this->getData();
         settype($data, 'string');
         $body->write($data);
 
-        return $this
+        $response = $this
             ->getResponse()
             ->withBody($body)
             ->withStatus($this->getStatusCode())
             ->withHeader('Content-Type', $this->getContentType());
+
+        if ($response->hasHeader('Content-Length')) {
+            $response = $response->withHeader(
+                'Content-Length',
+                $response->getBody()->getSize()
+            );
+        }
+
+        return $response;
     }
 }
