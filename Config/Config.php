@@ -50,7 +50,7 @@ return [
             'defaultTtl' => 900,
             'htaccess' => true,
             'default_chmod' => 0777,
-            'path' => '',
+            'path' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . 'Cache',
             'fallback' => false,
             'limited_memory_each_object' => 4096,
             'compress_data' => false,
