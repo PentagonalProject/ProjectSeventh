@@ -177,4 +177,5 @@ vendor
 /Modules/*/
 /Extensions/*/
 /Config/Config.php
+/Config/Routes
 
