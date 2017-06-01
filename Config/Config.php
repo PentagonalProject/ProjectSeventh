@@ -7,9 +7,9 @@
  */
 return [
     'directory' => [
-        'storage'   => __DIR__ . DIRECTORY_SEPARATOR . 'Storage',
-        'module'    => __DIR__ . DIRECTORY_SEPARATOR . 'Modules',
-        'extension' => __DIR__ . DIRECTORY_SEPARATOR . 'Extensions',
+        'storage'   => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Storage',
+        'module'    => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Modules',
+        'extension' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Extensions',
         // load from example
         // 'extension' => __DIR__ . DIRECTORY_SEPARATOR . '_example/Extensions',
         // 'module'    => __DIR__ . DIRECTORY_SEPARATOR . '_example/Modules',
