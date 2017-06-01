@@ -93,9 +93,9 @@ EOF;
 EOF;
         }
 
-        header("Content-Type: {$accept}", true, 200);
         $length = strlen($content);
-        header("Content-Length: {$length}", true, 200);
+        header("Content-Type: {$accept}", true, 500);
+        header("Content-Length: {$length}", true, 500);
     } else {
         $content = "\n(Error) {$content}\n\n";
     }
@@ -109,5 +109,26 @@ require __DIR__ . '/../vendor/autoload.php';
 // if the composer that must not ../App/FunctionIncludes.php
 // try to includes once (beware FunctionsIncludes.php must be load after vendor loaded)
 require_once __DIR__ .'/../App/FunctionsIncludes.php';
-return (new PentagonalProject\ProjectSeventh\Application())
-    ->process((array) require __DIR__ . '/../Config/Config.php');
+/**
+ * @var \PentagonalProject\ProjectSeventh\Application $app
+ */
+$app = new PentagonalProject\ProjectSeventh\Application();
+register_shutdown_function(function () {
+    print_r(error_get_last());
+    exit;
+});
+
+/**
+ * @var \PentagonalProject\ProjectSeventh\Hook $hook
+ * @var \Psr\Http\Message\ResponseInterface $response
+ */
+$response = $app->process((array) require __DIR__ . '/../Config/Config.php');
+$hook = $app[CONTAINER_HOOK];
+$app
+    ->getSlim()
+    ->respond(
+        $hook->apply(
+            HOOK_HANDLER_RESPONSE,
+            $response
+        )
+    );
