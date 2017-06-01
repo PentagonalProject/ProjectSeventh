@@ -30,17 +30,24 @@ namespace {
     if (!is_array($config['directory'])) {
         $config['directory'] =  [];
     }
-    $config['httpVersion'] = isset($_SERVER['SERVER_PROTOCOL'])
+
+    // override Environment as Array
+    if (!isset($config['environment']) || !is_array($config['environment'])) {
+        $config['environment'] = [];
+    }
+
+    // auto httpVersion
+    $config['environment']['httpVersion'] = isset($_SERVER['SERVER_PROTOCOL'])
     && strpos($_SERVER['SERVER_PROTOCOL'], '/') !== false
         ? explode('/', $_SERVER['SERVER_PROTOCOL'])[1]
         : '1.1';
 
     return function (Container $container) use (&$config) : Config {
         // override Server Protocol
-        $container['settings']['httpVersion'] = $config['httpVersion'];
+        $container['settings']['httpVersion'] = $config['environment']['httpVersion'];
         /** @var Response $response */
         $response = clone $container[CONTAINER_RESPONSE];
-        if ($response->getProtocolVersion() != $config['httpVersion']) {
+        if ($response->getProtocolVersion() != $config['environment']['httpVersion']) {
             unset($container[CONTAINER_RESPONSE]);
             try {
                 $newResponse = $response->withProtocolVersion($config['httpVersion']);
@@ -49,7 +56,6 @@ namespace {
                 $container[CONTAINER_RESPONSE] = $response;
             }
         }
-
         /** @var Application $application */
         $application = $container[CONTAINER_APPLICATION];
         $config['directory'] = array_merge([
@@ -63,6 +69,7 @@ namespace {
                 'config' => CacheManager::getDefaultConfig()
             ];
         }
+
         if (!is_string($config['cache']['driver']) || trim($config['cache']['driver']) == '') {
             $config['cache']['driver'] = 'Auto';
         }
@@ -92,6 +99,14 @@ namespace {
         }
         $config['cache']['driver'] = $cacheDriver;
         $config['cache']['config'] = $cacheConfig;
-        return new Config($config);
+        $config = new Config($config);
+        /**
+         * Config Override
+         */
+        $container['settings']['displayErrorDetails'] = (bool) $config['environment[error]'];
+        $container['settings']['addContentLengthHeader'] = ! isset($config['environment[addContentLengthHeader]'])
+            ? true
+            : (bool) $config['environment[addContentLengthHeader]'];
+        return $config;
     };
 }
