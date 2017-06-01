@@ -82,6 +82,8 @@ define('HOOK_HANDLER_FOUND_RESPONSE', 'Handler:Found:Response');
 define('HOOK_HANDLER_CACHE_DRIVER', 'Handler:Cache:Driver');
 define('HOOK_HANDLER_CACHE_CONFIG', 'Handler:Cache:Config');
 
+define('HOOK_HANDLER_RESPONSE', 'Handler:Response');
+
 /* GLOBAL CONSTANT LOG MODE
  * ----------------------------- */
 
