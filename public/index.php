@@ -119,11 +119,16 @@ register_shutdown_function(function () {
 });
 
 /**
+ * Get Response From Process
+ *
  * @var \PentagonalProject\ProjectSeventh\Hook $hook
  * @var \Psr\Http\Message\ResponseInterface $response
  */
 $response = $app->process((array) require __DIR__ . '/../Config/Config.php');
 $hook = $app[CONTAINER_HOOK];
+/**
+ * Print The Response Output
+ */
 $app
     ->getSlim()
     ->respond(
