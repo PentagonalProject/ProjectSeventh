@@ -298,6 +298,9 @@ class Application implements \ArrayAccess
             $this->getComponentDirectory('ApplicationSlimObject.php'),
             $config
         );
+
+        // call container
+        $this->includeScope($this->getComponentDirectory('ApplicationContainer.php'));
         // call middleware
         $this->includeScope($this->getComponentDirectory('ApplicationMiddleware.php'));
         // determine & call routes
