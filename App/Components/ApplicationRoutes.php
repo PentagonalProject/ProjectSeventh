@@ -25,9 +25,17 @@ namespace {
     $config = $app[CONTAINER_CONFIG];
     if (($routes = $config['autoload[routes]'])&& is_array($routes)) {
         $c = 0;
+        // anonymous function to require file as binding Slim\App
+        $slimInit = function ($file) {
+            /** @noinspection PhpIncludeInspection */
+            require_once $file;
+        };
+
+        // binding to Slim\App for $this
+        $slimInit = $slimInit->bindTo($app->getSlim());
         foreach ($routes as $route) {
             if (is_string($route) && file_exists($route)) {
-                $app->includeScope($route);
+                $slimInit($route);
                 $c++;
             }
         }

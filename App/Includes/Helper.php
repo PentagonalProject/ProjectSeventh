@@ -168,21 +168,33 @@ function isMobile() : bool
 function getAliasLogLevel(int $code) : int
 {
     switch ($code) {
+        case \Monolog\Logger::ALERT:
+            return \Monolog\Logger::ALERT;
+        case \Monolog\Logger::CRITICAL:
+            return \Monolog\Logger::CRITICAL;
+        case E_ALL:
+        case \Monolog\Logger::DEBUG:
+            return \Monolog\Logger::DEBUG;
         case E_NOTICE:
         case E_USER_NOTICE:
         case E_DEPRECATED:
         case E_USER_DEPRECATED:
+        case \Monolog\Logger::NOTICE:
             return \Monolog\Logger::NOTICE;
         case E_ERROR:
         case E_CORE_ERROR:
         case E_COMPILE_ERROR:
+        case \Monolog\Logger::ERROR:
             return \Monolog\Logger::ERROR;
+        case \Monolog\Logger::INFO:
+            return \Monolog\Logger::INFO;
+        case \Monolog\Logger::EMERGENCY:
+            return \Monolog\Logger::EMERGENCY;
         case E_WARNING:
         case E_USER_WARNING:
         case E_COMPILE_WARNING:
+        case \Monolog\Logger::WARNING:
             return \Monolog\Logger::WARNING;
-        case E_ALL:
-            return \Monolog\Logger::DEBUG;
     }
 
     return 0;

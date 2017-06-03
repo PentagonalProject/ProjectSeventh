@@ -58,16 +58,22 @@ namespace {
 
     /**
      * Includes Middleware auto load from config
-     */
-    /**
+     *
      * @var Config $config
      */
     $config = $app[CONTAINER_CONFIG];
     if (($middleWares = $config['autoload[middleware]']) && is_array($middleWares)) {
         $c = 0;
+        // anonymous function to require file as binding Slim\App
+        $slimInit = function ($file) {
+            /** @noinspection PhpIncludeInspection */
+            require_once $file;
+        };
+        // binding to Slim\App for $this
+        $slimInit = $slimInit->bindTo($slim);
         foreach ($middleWares as $middleWare) {
             if (is_string($middleWare) && file_exists($middleWare)) {
-                $app->includeScope($middleWare);
+                $slimInit($middleWare);
                 $c++;
             }
         }

@@ -67,9 +67,16 @@ return [
         'secure'   => null,
     ],
     // auto loading on separate loaded init
+    // files that loaded has variable $this that instanceof Slim\App
     'autoload' => [
+        // load Container / Register Additional Container
+        'container' => [
+            __DIR__ . '/Example.Container.php'
+        ],
         // load middle ware end of middle ware init
         'middleware' => [
+            // example Route
+            __DIR__ . '/Example.Middleware.php'
         ],
         // load on routes
         'routes'  => [

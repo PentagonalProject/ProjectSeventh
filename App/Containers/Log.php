@@ -29,7 +29,10 @@ namespace {
                     ? LOG_MODE_DEFAULT
                     : Logger::WARNING
                 );
-
+            $type = getAliasLogLevel($type);
+            $type = $type > 0 ? $type : 0;
+        }
+        if (!empty($type)) {
             $logName = $config['environment[log_name]'];
             if (!$logName || !is_string($logName) || trim($logName) == '') {
                 $logName = getDefaultLogNameByCode($type, 'logs.log');
@@ -61,6 +64,7 @@ namespace {
                 $type
             ));
         }
+
         return $logger;
     };
 }

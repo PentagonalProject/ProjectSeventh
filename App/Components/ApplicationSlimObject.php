@@ -153,6 +153,12 @@ namespace {
              * @return AbstractError
              */
             CONTAINER_PHP_ERROR_HANDLER => $app->includeScope($app->getContainerDirectory('PhpErrorHandler.php')),
+            /**
+             * ShutDown Handler
+             *
+             * @return mixed
+             */
+            CONTAINER_SHUTDOWN => $app->includeScope($app->getContainerDirectory('ShutdownHandler.php')),
         ]
     );
 }

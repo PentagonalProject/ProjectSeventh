@@ -98,7 +98,7 @@ $response = $app->process([
         'log_name' => null,
     ],
     'cache'      => [
-        'driver' => 'driverName',
+        'driver' => 'driverName', // change with existing driver
         /**
          * @see \phpFastCache\CacheManager::getDefaultConfig()
          */
@@ -112,6 +112,7 @@ $response = $app->process([
             'fallback' => false,
             'limited_memory_each_object' => 4096,
             'compress_data' => false,
+            // add additional config eg : host & port for redis
         ]
     ],
     'session'  => [
@@ -126,7 +127,14 @@ $response = $app->process([
     ],
     // auto loading on separate loaded init
     'autoload' => [
-        'middleware' => [],
+        'container' => [
+            // example Container
+            '/Path/To/ContainerFile.php'    
+        ],
+        'middleware' => [
+            // example Middleware
+            '/Path/To/MiddleWareFile.php'
+        ],
         'routes'  => [
             // example Route
             '/Path/To/RouteFile.php'

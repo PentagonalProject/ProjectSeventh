@@ -48,6 +48,9 @@ define('CONTAINER_SESSIONS', CONTAINER_SESSION);
 // cache
 define('CONTAINER_CACHE', 'cache');
 
+// shutdown Handler
+define('CONTAINER_SHUTDOWN', 'shutdown');
+
 define('CONTAINER_SLIM', 'slim');
 define('CONTAINER_REQUEST', 'request');
 define('CONTAINER_RESPONSE', 'response');
@@ -82,6 +85,9 @@ define('HOOK_HANDLER_FOUND_RESPONSE', 'Handler:Found:Response');
 define('HOOK_HANDLER_CACHE_DRIVER', 'Handler:Cache:Driver');
 define('HOOK_HANDLER_CACHE_CONFIG', 'Handler:Cache:Config');
 
+// shutdown Hook
+define('HOOK_HANDLER_SHUTDOWN', 'Handler:Shutdown');
+// response
 define('HOOK_HANDLER_RESPONSE', 'Handler:Response');
 
 /* GLOBAL CONSTANT LOG MODE

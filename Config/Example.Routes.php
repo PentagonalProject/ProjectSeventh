@@ -2,10 +2,12 @@
 /* ------------------------------------------------------ *\
  |                     ROUTES EXAMPLE                     |
 \* ------------------------------------------------------ */
-
+/**
+ * @uses \Slim\App
+ * for instance of $this
+ */
 namespace {
 
-    use \PentagonalProject\ProjectSeventh\Arguments;
     use PentagonalProject\ProjectSeventh\ResponseGenerator\Json;
     use PentagonalProject\ProjectSeventh\ResponseGenerator\Xml;
     use Psr\Http\Message\ResponseInterface;
@@ -14,16 +16,12 @@ namespace {
     use Slim\Http\Body;
     use Slim\Http\Response;
 
-    if (!isset($this) || ! $this instanceof Arguments) {
+    if (!isset($this) || ! $this instanceof App) {
         header('HTTP/1.1 403 Forbidden');
         return;
     }
 
-    /**
-     * @var App $slim
-     */
-    $slim = $this[CONTAINER_APPLICATION]->getSlim();
-    $slim->any(
+    $this->any(
         '/helo[/[{name: [A-Za-z0-9\S]+}[/]]]',
         function (
             ServerRequestInterface $request,
@@ -46,7 +44,7 @@ namespace {
         }
     );
 
-    $slim->any(
+    $this->any(
         '/xml[/]',
         function (
             ServerRequestInterface $request,
@@ -67,7 +65,7 @@ namespace {
         }
     );
 
-    $slim->any(
+    $this->any(
         '/json[/]',
         function (
             ServerRequestInterface $request,

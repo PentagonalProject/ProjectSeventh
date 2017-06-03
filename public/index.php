@@ -113,10 +113,6 @@ require_once __DIR__ .'/../App/FunctionsIncludes.php';
  * @var \PentagonalProject\ProjectSeventh\Application $app
  */
 $app = new PentagonalProject\ProjectSeventh\Application();
-register_shutdown_function(function () {
-    print_r(error_get_last());
-    exit;
-});
 
 /**
  * Get Response From Process
@@ -125,6 +121,7 @@ register_shutdown_function(function () {
  * @var \Psr\Http\Message\ResponseInterface $response
  */
 $response = $app->process((array) require __DIR__ . '/../Config/Config.php');
+
 $hook = $app[CONTAINER_HOOK];
 /**
  * Print The Response Output
