@@ -5,6 +5,7 @@ use Apatis\Exceptions\Exception;
 use Apatis\Exceptions\InvalidArgumentException;
 use Apatis\Exceptions\RuntimeException;
 use PentagonalProject\ProjectSeventh\Abstracts\EmbeddedSystem;
+use PentagonalProject\ProjectSeventh\Arguments;
 use PentagonalProject\ProjectSeventh\Exceptions\EmptyFileException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidPathException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidEmbeddedException;
@@ -360,7 +361,12 @@ class EmbeddedReader
         ob_start();
 
         // include once
-        IncludeFileOnce($this->file);
+        (function ($file) {
+            /** @noinspection PhpIncludeInspection */
+            require_once $file;
+        })
+        // binding to None of $this
+        ->bindTo(null)($this->file);
         if ($error = error_get_last() && !empty($error) && $error['file'] == $this->file) {
             if ($error['type'] === E_ERROR) {
                 @ob_end_clean();
@@ -373,7 +379,9 @@ class EmbeddedReader
                 );
             }
         }
-        @ob_end_clean();
+        if (ob_get_length()) {
+            @ob_end_clean();
+        }
         if (!class_exists($class)) {
             throw new InvalidEmbeddedException(
                 sprintf(
@@ -384,7 +392,15 @@ class EmbeddedReader
                 E_ERROR
             );
         }
-
+        if (! method_exists($class, 'init')) {
+            throw new InvalidEmbeddedException(
+                sprintf(
+                    'File %1$s does not contain method `init`.',
+                    $this->getName()
+                ),
+                E_ERROR
+            );
+        }
         $this->valid = true;
         $this->instance = new $class;
         return $this;
