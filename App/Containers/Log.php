@@ -32,33 +32,56 @@ namespace {
             $type = getAliasLogLevel($type);
             $type = $type > 0 ? $type : 0;
         }
+
         if (!empty($type)) {
             $logName = $config['environment[log_name]'];
+            $hasLog = true;
             if (!$logName || !is_string($logName) || trim($logName) == '') {
+                $hasLog = false;
                 $logName = getDefaultLogNameByCode($type, 'logs.log');
             }
 
-            $logName = str_replace(
-                [
-                    '/',
-                    '\\'
-                ],
-                '_',
+            $logName = $hasLog ? preg_replace(
+                '/(\\\|\/)/',
+                DIRECTORY_SEPARATOR,
                 $logName
-            );
+            ) : $logName;
+
+            $selfLog = ! ($hasLog);
+            if (!$selfLog && (
+                DIRECTORY_SEPARATOR == '/' && $logName[0] === DIRECTORY_SEPARATOR ||
+                DIRECTORY_SEPARATOR == '\\' && preg_match('/^([a-z]+)\:\\/i', $logName)
+                )
+            ) {
+                $selfLog = file_exists($logName)
+                    || (dirname($logName) !== DIRECTORY_SEPARATOR
+                        && is_dir(dirname($logName))
+                        && is_writable(dirname($logName))
+                    );
+            }
+
+            if (! $selfLog) {
+                $logName = str_replace(
+                    [
+                        '/',
+                        '\\'
+                    ],
+                    '_',
+                    $logName
+                );
+
+                /**
+                 * @var Application $app
+                 */
+                $app = $container[CONTAINER_APPLICATION];
+                $logName = $app->getFixPath(
+                    $config['directory[storage]']
+                    . '/logs/'
+                    . $logName
+                );
+            }
 
             $config['environment[log_name]'] = $logName;
-
-            /**
-             * @var Application $app
-             */
-            $app = $container[CONTAINER_APPLICATION];
-            $logName = $app->getFixPath(
-                $config['directory[storage]']
-                . '/logs/'
-                . $logName
-            );
-
             $logger->pushHandler(new StreamHandler(
                 $logName,
                 $type
