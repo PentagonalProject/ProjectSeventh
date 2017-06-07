@@ -104,6 +104,7 @@ class DatabaseSchemeTableDefinition
             'table_add' => [
                 'index' => 'mixed',
                 'uniqueindex' => 'mixed',
+                'unique' => 'mixed',
                 'foreignkey' => 'array',
                 'foreignkeyconstraint' => 'array',
             ],
@@ -154,6 +155,11 @@ class DatabaseSchemeTableDefinition
                         }
                         $properties['set'][$optionKey][$column] = $value === '' ? true : $value;
                     } elseif (isset($availableOptions['table_add'][$optionKey])) {
+                        if ($optionKey == 'unique') {
+                            $optionKey =  'uniqueindex';
+                        } elseif ($optionKey == 'foreignkeyconstraint') {
+                            $optionKey =  'foreignkeyconstraint';
+                        }
                         $type = $availableOptions['table_add'][$optionKey];
                         if ($type === 'array') {
                             if (gettype($value) !== 'array') {
@@ -164,12 +170,17 @@ class DatabaseSchemeTableDefinition
                             }
                             continue;
                         }
+
+                        if ($optionKey == 'uniqueindex') {
+                            $value = ! is_string($value) ? $column . '_' . (string) $value : $value;
+                            $value = preg_replace('/[^a-z0-9\_]/i', '_', $value);
+                        }
+
                         if (!is_string($value)) {
                             $value = (bool) $value;
                         }
-                        if ($value) {
-                            $properties['add'][$optionKey][$column] = $value;
-                        }
+
+                        $properties['add'][$optionKey][$column] = $value;
                     }
                 }
 
@@ -456,7 +467,7 @@ class DatabaseSchemeTableDefinition
             (?P<binary>bin)
             | (?P<datetimez>datetimez|timez)
             | (?P<guid>gu|id)
-            | (?P<datetime>date)
+            | (?P<datetime>date|stamp)
             | (?P<time>time?)
             | (?P<blob>blob)
             | (?P<text>text|long)
