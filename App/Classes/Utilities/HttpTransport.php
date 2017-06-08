@@ -22,6 +22,10 @@ use Psr\Http\Message\UriInterface;
  * @method ResponseInterface unLink(string|UriInterface $uri, array $options = [])
  * @method ResponseInterface copy(string|UriInterface $uri, array $options = [])
  * @method ResponseInterface purge(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface view(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface propView(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface lock(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface unLock(string|UriInterface $uri, array $options = [])
  *
  * @method PromiseInterface getAsync(string|UriInterface $uri, array $options = [])
  * @method PromiseInterface headAsync(string|UriInterface $uri, array $options = [])
@@ -34,7 +38,10 @@ use Psr\Http\Message\UriInterface;
  * @method PromiseInterface unLinkAsync(string|UriInterface $uri, array $options = [])
  * @method PromiseInterface copyAsync(string|UriInterface $uri, array $options = [])
  * @method PromiseInterface purgeAsync(string|UriInterface $uri, array $options = [])
- *
+ * @method PromiseInterface viewAsync(string|UriInterface $uri, array $options = [])
+ * @method PromiseInterface propViewAsync(string|UriInterface $uri, array $options = [])
+ * @method PromiseInterface lockAsync(string|UriInterface $uri, array $options = [])
+ * @method PromiseInterface unLockAsync(string|UriInterface $uri, array $options = [])
  */
 class HttpTransport
 {
