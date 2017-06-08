@@ -76,7 +76,7 @@ class HttpTransport
      * @param CookieJar|null $cookieJar
      * @return HttpTransport
      */
-    public function withCookieJar(CookieJar $cookieJar = null)
+    public function withCookieJar(CookieJar $cookieJar = null) : HttpTransport
     {
         $config = $this->guzzleClient->getConfig();
         $config['cookies'] = $cookieJar?: new CookieJar();
@@ -89,7 +89,7 @@ class HttpTransport
      *
      * @return HttpTransport
      */
-    public function withoutCookie()
+    public function withoutCookie() : HttpTransport
     {
         $config = $this->guzzleClient->getConfig();
         unset($config['cookies']);
