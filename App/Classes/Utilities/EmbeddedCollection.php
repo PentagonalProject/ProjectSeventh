@@ -20,6 +20,9 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
     const TYPE_SYMLINK = 'link';
     const TYPE_FILE = 'file';
 
+    const CLASS_NAME_KEY = 'className';
+    const FILE_PATH_KEY  = 'filePath';
+
     /**
      * @var RecursiveDirectoryIterator
      */
@@ -36,7 +39,8 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
     protected $unwantedPath = [];
 
     /**
-     * @var EmbeddedSystem[]|\Closure[]
+     * @var EmbeddedSystem[]|string[]
+     * String if Has not Loaded and Instanceof @uses EmbeddedSystem if loaded
      */
     protected $validEmbedded = [];
 
@@ -119,7 +123,7 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
     /**
      * @return EmbeddedSystem[]
      */
-    public function getAllEmbedded() : array
+    public function getAllValidEmbedded() : array
     {
         return $this->validEmbedded;
     }
@@ -167,10 +171,23 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
             }
 
             try {
-                $this->validEmbedded[$this->sanitizeEmbeddedName($baseName)] = function () use ($file) {
-                    $embedded = $this->embeddedReader->create($file)->process();
-                    return $embedded->getInstance();
-                };
+                $embedded = $this
+                    ->embeddedReader
+                    ->create($file)
+                    ->process();
+                if (!$embedded->isValid()) {
+                    throw new InvalidEmbeddedException(
+                        sprintf(
+                            '%1$s Is not valid.',
+                            $this->embeddedReader->getName()
+                        )
+                    );
+                }
+
+                $this->validEmbedded[$this->sanitizeEmbeddedName($baseName)] = [
+                    static::CLASS_NAME_KEY => $embedded->getClassName(),
+                    static::FILE_PATH_KEY => $embedded->getFile(),
+                ];
             } catch (\Exception $e) {
                 $this->invalidEmbedded[$this->sanitizeEmbeddedName($baseName)] = $e;
             }
@@ -253,10 +270,12 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
     /**
      * Get Embedded Given By Name
      *
-     * @access internal
+     * @access protected
+     *
      * @param string $name
      * @return EmbeddedSystem
      * @throws InvalidEmbeddedException
+     * @throws \Exception
      */
     protected function &internalGetEmbedded(string $name) : EmbeddedSystem
     {
@@ -267,6 +286,7 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
                 E_USER_ERROR
             );
         }
+
         if (!$this->exist($embeddedName)) {
             throw new InvalidEmbeddedException(
                 sprintf(
@@ -276,8 +296,43 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
                 )
             );
         }
-        if ($this->validEmbedded[$embeddedName] instanceof \Closure) {
-            $this->validEmbedded[$embeddedName] = $this->validEmbedded[$embeddedName]();
+
+        if (is_array($this->validEmbedded[$embeddedName])) {
+            $className = empty($this->validEmbedded[$embeddedName][static::CLASS_NAME_KEY])
+                ? null
+                : (string) $this->validEmbedded[$embeddedName][static::CLASS_NAME_KEY];
+
+            if (! $className
+                || ! class_exists($this->validEmbedded[$embeddedName][static::CLASS_NAME_KEY])
+            ) {
+                throw new InvalidEmbeddedException(
+                    sprintf(
+                        '%1$s %2$s has not found',
+                        $this->embeddedReader->getName(),
+                        $name
+                    )
+                );
+            }
+
+            $embedded = new $className(
+                $this->embeddedReader->getContainer()
+            );
+
+            $this->validEmbedded[$embeddedName] = $embedded;
+        }
+
+        if (! $this->validEmbedded[$embeddedName] instanceof EmbeddedSystem) {
+            unset($this->validEmbedded[$embeddedName]);
+            $e = new InvalidEmbeddedException(
+                sprintf(
+                    '%1$s %2$s Is not valid.',
+                    $this->embeddedReader->getName(),
+                    $name
+                )
+            );
+
+            $this->invalidEmbedded[$embeddedName] = $e;
+            throw $e;
         }
 
         return $this->validEmbedded[$embeddedName];
@@ -302,7 +357,7 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
     public function getAllEmbeddedInfo()
     {
         $embed_info = new Collection();
-        foreach ($this->getAllEmbedded() as $embedName => $embed) {
+        foreach ($this->getAllValidEmbedded() as $embedName => $embed) {
             $embed_info[$embedName] = $this->getEmbedInfo($embedName);
         }
 

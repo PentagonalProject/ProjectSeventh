@@ -9,6 +9,7 @@ use PentagonalProject\ProjectSeventh\Arguments;
 use PentagonalProject\ProjectSeventh\Exceptions\EmptyFileException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidPathException;
 use PentagonalProject\ProjectSeventh\Exceptions\InvalidEmbeddedException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class EmbeddedReader
@@ -27,6 +28,11 @@ class EmbeddedReader
     protected $file = false;
 
     /**
+     * @var string
+     */
+    protected $class;
+
+    /**
      * @var EmbeddedSystem
      */
     protected $instance;
@@ -42,10 +48,35 @@ class EmbeddedReader
     protected $name = 'Embed';
 
     /**
-     * EmbeddedReader constructor.
+     * @var ContainerInterface
      */
-    final public function __construct()
+    protected $container;
+
+    /**
+     * EmbeddedReader constructor.
+     * @param ContainerInterface $container
+     */
+    final public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * Get Container
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**
@@ -109,12 +140,12 @@ class EmbeddedReader
      * Create Instance EmbeddedReader
      *
      * @param string $file
-     * @return static
+     * @return EmbeddedReader
      */
-    public static function create(string $file)
+    public function create(string $file)
     {
-        $static = new static();
-        return $static->setFileToLoad($file);
+        $clone = clone $this;
+        return $clone->setFileToLoad($file);
     }
 
     /**
@@ -150,7 +181,19 @@ class EmbeddedReader
      */
     public function getInstance()
     {
+        if ($this->valid && $this->class && !$this->instance) {
+            $this->instance = new $this->class($this->container);
+        }
+
         return $this->instance;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->class;
     }
 
     /**
@@ -251,10 +294,11 @@ class EmbeddedReader
                     E_ERROR
                 );
             }
+
             $namespace .= $namespaces['namespace'];
         }
 
-        if ($namespace !== '\\' && preg_match('`[^\\_a-z0-9]`', $namespace)) {
+        if ($namespace !== '\\' && preg_match('`[^\\\_a-z0-9]`i', $namespace, $match)) {
             throw new InvalidEmbeddedException(
                 sprintf(
                     'File %s contain invalid name space.',
@@ -401,8 +445,20 @@ class EmbeddedReader
                 E_ERROR
             );
         }
+
         $this->valid = true;
-        $this->instance = new $class;
+        $this->class = $class;
         return $this;
+    }
+
+    /**
+     * Reset Properties if Being Clone
+     */
+    public function __clone()
+    {
+        $this->valid = null;
+        $this->file = false;
+        $this->class = null;
+        $this->instance = null;
     }
 }

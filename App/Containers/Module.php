@@ -24,8 +24,9 @@ namespace {
         $config = $container[CONTAINER_CONFIG];
         $moduleCollection = new EmbeddedCollection(
             $config->get('directory[module]'),
-            new ModuleReader()
+            new ModuleReader($container)
         );
+
         $moduleCollection->scan();
         $container[CONTAINER_LOG]->debug(
             'Extensions initiated & scan',

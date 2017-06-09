@@ -2,6 +2,7 @@
 namespace PentagonalProject\ProjectSeventh\Abstracts;
 
 use PentagonalProject\ProjectSeventh\Interfaces\EmbeddedInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class EmbeddedSystem
@@ -61,11 +62,23 @@ abstract class EmbeddedSystem implements EmbeddedInterface
     protected $embedded_description = '';
 
     /**
-     * EmbeddedSystem constructor.
-     * @final as prevent to instantiate
+     * @var ContainerInterface
      */
-    final public function __construct()
+    protected $embedded_container;
+
+    /**
+     * @var \ReflectionClass
+     */
+    private $privateEmbeddedReflectionClass;
+
+    /**
+     * EmbeddedSystem constructor.
+     * @param ContainerInterface $container
+     * @final as prevent to inheritance
+     */
+    final public function __construct(ContainerInterface $container)
     {
+        $this->embedded_container = $container;
         $this->getEmbeddedName();
     }
 
@@ -95,12 +108,11 @@ abstract class EmbeddedSystem implements EmbeddedInterface
      */
     final protected function getEmbeddedReflection() : \ReflectionClass
     {
-        static $reflection;
-        if (!$reflection || ! $reflection instanceof \ReflectionClass) {
-            $reflection = new \ReflectionClass($this);
+        if (! $this->privateEmbeddedReflectionClass instanceof \ReflectionClass) {
+            $this->privateEmbeddedReflectionClass = new \ReflectionClass($this);
         }
 
-        return $reflection;
+        return $this->privateEmbeddedReflectionClass;
     }
 
     /**
