@@ -245,7 +245,7 @@ class EmbeddedCollection implements \Countable, \ArrayAccess
      * @param string $name
      * @return string
      */
-    protected function sanitizeEmbeddedName(string $name) : string
+    public function sanitizeEmbeddedName(string $name) : string
     {
         return trim(strtolower($name));
     }
